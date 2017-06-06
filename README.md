@@ -19,6 +19,10 @@
 #
 -->
 
+[![Build status](https://ci.appveyor.com/api/projects/status/wxkmo0jalsr8gane?svg=true)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-fetch/branch/master)
+[![Build Status](https://travis-ci.org/apache/cordova-fetch.svg?branch=master)](https://travis-ci.org/apache/cordova-fetch)
+[![NPM](https://nodei.co/npm/cordova-fetch.png)](https://nodei.co/npm/cordova-fetch/)
+
 # cordova-fetch
 
 This module is used for fetching modules from npm and gitURLs. It fetches the modules via `npm install`. It can also `npm uninstall` modules from a project.
