@@ -64,6 +64,14 @@ describe('platform fetch/uninstall tests via npm & git', function () {
         })
         .then(function() {
             expect(fs.existsSync(path.join(tmpDir,'node_modules', 'cordova-ios'))).toBe(false);    
+            
+            return fetch('git+ssh://git@github.com/apache/cordova-browser.git#487d91d1ded96b8e2029f2ee90f12a8b20499f54', tmpDir, opts);
+        })
+        .then(function(result) {
+            var pkgJSON = require(path.join(result,'package.json'));
+            expect(result).toBeDefined();
+            expect(fs.existsSync(result)).toBe(true);
+            expect(pkgJSON.name).toBe('cordova-browser');
         })
         .fail(function(err) {
             console.error(err);
