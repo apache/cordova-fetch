@@ -19,7 +19,7 @@
 #
 -->
 
-[![Build status](https://ci.appveyor.com/api/projects/status/wxkmo0jalsr8gane?svg=true)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-fetch/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/6xv212nihtcnbsov?svg=true)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-fetch/branch/master)
 [![Build Status](https://travis-ci.org/apache/cordova-fetch.svg?branch=master)](https://travis-ci.org/apache/cordova-fetch)
 [![NPM](https://nodei.co/npm/cordova-fetch.png)](https://nodei.co/npm/cordova-fetch/)
 
