@@ -32,39 +32,39 @@ describe('platform fetch/uninstall tests via npm & git', function () {
     beforeEach(function() {
         process.chdir(tmpDir);
     });
-    
+
     afterEach(function() {
         process.chdir(path.join(__dirname, '..'));  // Needed to rm the dir on Windows.
         shell.rm('-rf', tmpDir);
     });
 
     it('should fetch and uninstall a cordova platform via npm & git', function(done) {
-        
+
         fetch('cordova-android', tmpDir, opts)
         .then(function(result) {
             var pkgJSON = require(path.join(result,'package.json'));
             expect(result).toBeDefined();
             expect(fs.existsSync(result)).toBe(true);
             expect(pkgJSON.name).toBe('cordova-android');
-            
+
             return uninstall('cordova-android', tmpDir, opts);
         })
         .then(function() {
             expect(fs.existsSync(path.join(tmpDir,'node_modules', 'cordova-android'))).toBe(false);
-            
-            return fetch('https://github.com/apache/cordova-ios.git', tmpDir, opts);       
+
+            return fetch('https://github.com/apache/cordova-ios.git', tmpDir, opts);
         })
         .then(function(result) {
             var pkgJSON = require(path.join(result,'package.json'));
             expect(result).toBeDefined();
             expect(fs.existsSync(result)).toBe(true);
             expect(pkgJSON.name).toBe('cordova-ios');
-            
+
             return uninstall('cordova-ios', tmpDir, opts);
         })
         .then(function() {
-            expect(fs.existsSync(path.join(tmpDir,'node_modules', 'cordova-ios'))).toBe(false);    
-            
+            expect(fs.existsSync(path.join(tmpDir,'node_modules', 'cordova-ios'))).toBe(false);
+
             return fetch('git+ssh://git@github.com/apache/cordova-browser.git#487d91d1ded96b8e2029f2ee90f12a8b20499f54', tmpDir, opts);
         })
         .then(function(result) {
@@ -85,13 +85,13 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
 
     var tmpDir = helpers.tmpDir('plat_fetch_save');
     var opts = {'save':true};
-    
+
     beforeEach(function() {
         //copy package.json from spec directory to tmpDir
         shell.cp('spec/testpkg.json', path.join(tmpDir,'package.json'));
         process.chdir(tmpDir);
     });
-    
+
     afterEach(function() {
         process.chdir(path.join(__dirname, '..'));  // Needed to rm the dir on Windows.
         shell.rm('-rf', tmpDir);
@@ -116,7 +116,7 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
             expect(Object.keys(rootPJ.dependencies).length).toBe(0);
             expect(fs.existsSync(path.join(tmpDir,'node_modules', 'cordova-android'))).toBe(false);
 
-            return fetch('https://github.com/apache/cordova-ios.git#rel/4.1.1', tmpDir, opts);       
+            return fetch('https://github.com/apache/cordova-ios.git#rel/4.1.1', tmpDir, opts);
         })
         .then(function(result) {
             var pkgJSON = require(path.join(result,'package.json'));
@@ -161,13 +161,13 @@ describe('plugin fetch/uninstall test with --save', function () {
 
     var tmpDir = helpers.tmpDir('plug_fetch_save');
     var opts = {'save':true};
-    
+
     beforeEach(function() {
         //copy package.json from spec directory to tmpDir
         shell.cp('spec/testpkg.json', path.join(tmpDir,'package.json'));
         process.chdir(tmpDir);
     });
-    
+
     afterEach(function() {
         process.chdir(path.join(__dirname, '..'));  // Needed to rm the dir on Windows.
         shell.rm('-rf', tmpDir);
@@ -202,13 +202,14 @@ describe('plugin fetch/uninstall test with --save', function () {
 
 describe('test trimID method for npm and git', function () {
 
-    var tmpDir = helpers.tmpDir('plug_trimID');
+    var tmpDir;
     var opts = {};
-    
+
     beforeEach(function() {
+        tmpDir = helpers.tmpDir('plug_trimID');
         process.chdir(tmpDir);
     });
-    
+
     afterEach(function() {
         process.chdir(path.join(__dirname, '..'));  // Needed to rm the dir on Windows.
         shell.rm('-rf', tmpDir);
@@ -221,7 +222,7 @@ describe('test trimID method for npm and git', function () {
             expect(result).toBeDefined();
             expect(fs.existsSync(result)).toBe(true);
             expect(pkgJSON.name).toBe('cordova-plugin-device');
-            
+
             return fetch('https://github.com/apache/cordova-plugin-media.git', tmpDir, opts);
         })
         .then(function(result) {
@@ -232,7 +233,7 @@ describe('test trimID method for npm and git', function () {
 
             //refetch to trigger trimID
             return fetch('cordova-plugin-device', tmpDir, opts);
-            
+
         })
         .then(function(result) {
             expect(result).toBeDefined();
@@ -261,17 +262,37 @@ describe('test trimID method for npm and git', function () {
         })
         .fin(done);
     }, 40000);
+
+    it('should fetch same plugin twice in a row if git repo name differ from plugin id', function(done) {
+        fetch('https://github.com/AzureAD/azure-activedirectory-library-for-cordova.git', tmpDir, opts)
+        .then(function(result) {
+            expect(result).toBeDefined();
+            expect(fs.existsSync(result)).toBe(true);
+            expect(result).toMatch('cordova-plugin-ms-adal');
+            return fetch('https://github.com/AzureAD/azure-activedirectory-library-for-cordova.git', tmpDir, opts);
+        })
+        .then(function(result) {
+            expect(result).toBeDefined();
+            expect(fs.existsSync(result)).toBe(true);
+            expect(result).toMatch('cordova-plugin-ms-adal');
+        })
+        .fail(function(err) {
+            console.error(err);
+            expect(err).toBeUndefined();
+        })
+        .fin(done);
+    }, 30000);
 });
 
 describe('fetch failure with unknown module', function () {
 
     var tmpDir = helpers.tmpDir('fetch_fails_npm');
     var opts = {};
-    
+
     beforeEach(function() {
         process.chdir(tmpDir);
     });
-    
+
     afterEach(function() {
         process.chdir(path.join(__dirname, '..'));  // Needed to rm the dir on Windows.
         shell.rm('-rf', tmpDir);
@@ -298,7 +319,7 @@ describe('fetch failure with git subdirectory', function () {
     beforeEach(function() {
         process.chdir(tmpDir);
     });
-    
+
     afterEach(function() {
         process.chdir(path.join(__dirname, '..'));  // Needed to rm the dir on Windows.
         shell.rm('-rf', tmpDir);
@@ -325,13 +346,13 @@ describe('scoped plugin fetch/uninstall tests via npm', function () {
     beforeEach(function() {
         process.chdir(tmpDir);
     });
-    
+
     afterEach(function() {
         process.chdir(path.join(__dirname, '..'));  // Needed to rm the dir on Windows.
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fetch a scoped plugin from npm', function(done) {       
+    it('should fetch a scoped plugin from npm', function(done) {
         fetch('@stevegill/cordova-plugin-device', tmpDir, opts)
         .then(function(result) {
             var pkgJSON = require(path.join(result,'package.json'));
