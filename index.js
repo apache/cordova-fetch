@@ -22,6 +22,7 @@ var shell = require('shelljs');
 var superspawn = require('cordova-common').superspawn;
 var events = require('cordova-common').events;
 var depls = require('dependency-ls');
+var url = require('url');
 var path = require('path');
 var fs = require('fs');
 var CordovaError = require('cordova-common').CordovaError;
@@ -89,7 +90,7 @@ module.exports = function(target, dest, opts) {
         //This could happen on a platform update.
         var id = getJsonDiff(tree1, tree2) || trimID(target); 
 
-        return getPath(id, dest);
+        return getPath(id, dest, target);
     }) 
     .fail(function(err){
         return Q.reject(new CordovaError(err));
@@ -184,13 +185,44 @@ function trimID(target) {
  *
  */
 
-function getPath(id, dest) {
-    var finalDest = path.resolve(path.join(dest, id));
-    
-    //Sanity check it exists
-    if(fs.existsSync(finalDest)){
-        return finalDest;
-    } else return Q.reject(new CordovaError('Failed to get absolute path to installed module'));
+function getPath(id, dest, target) {
+    var destination = path.resolve(path.join(dest, id));
+    var finalDest = fs.existsSync(destination) ? destination : searchDirForTarget(dest, target);
+
+    if (!finalDest) {
+        throw new CordovaError('Failed to get absolute path to installed module');
+    }
+
+    return finalDest;
+}
+
+/* 
+ * Make an additional search in destination folder using repository.url property from package.json
+ *
+ * @param {String} dest     destination of where to fetch the modules
+ * @param {String} target   target that was passed into cordova-fetch. can be moduleID, moduleID@version or gitURL
+ *
+ * @return {String}         Returns the absolute url for the module or null
+ *
+ */
+
+function searchDirForTarget(dest, target) {
+    if (!isUrl(target)) {
+        return;
+    }
+
+    var targetPathname = url.parse(target).pathname;
+
+    var pkgJsonPath = fs.readdirSync(dest).map(function(dir) {
+        return path.join(dest, dir, 'package.json');
+    })
+    .filter(fs.existsSync)
+    .find(function(pkgJsonPath) {
+        var repo = JSON.parse(fs.readFileSync(pkgJsonPath)).repository;
+        return repo && url.parse(repo.url).pathname === targetPathname;
+    });
+
+    return pkgJsonPath && path.dirname(pkgJsonPath);
 }
 
 /*
