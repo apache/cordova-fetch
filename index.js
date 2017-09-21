@@ -40,9 +40,10 @@ module.exports = function (target, dest, opts) {
     var fetchArgs = opts.link ? ['link'] : ['install'];
     opts = opts || {};
     var tree1;
+    opts.production = opts.production || true;
 
     // check if npm is installed
-    return isNpmInstalled()
+    return module.exports.isNpmInstalled()
         .then(function () {
             if (dest && target) {
                 // add target to fetchArgs Array
@@ -60,6 +61,10 @@ module.exports = function (target, dest, opts) {
 
             // set the directory where npm install will be run
             opts.cwd = dest;
+            // npm should use production by default when install is npm run
+            if (opts.production) {
+                fetchArgs.push('--production');
+            }
 
             // if user added --save flag, pass it to npm install command
             if (opts.save) {
@@ -88,7 +93,7 @@ module.exports = function (target, dest, opts) {
             // This could happen on a platform update.
             var id = getJsonDiff(tree1, tree2) || trimID(target);
 
-            return getPath(id, dest, target);
+            return module.exports.getPath(id, dest, target);
         })
         .fail(function (err) {
             return Q.reject(new CordovaError(err));
@@ -194,6 +199,7 @@ function getPath (id, dest, target) {
     return finalDest;
 }
 
+module.exports.getPath = getPath;
 /*
  * Make an additional search in destination folder using repository.url property from package.json
  *
@@ -235,6 +241,7 @@ function isNpmInstalled () {
     return Q();
 }
 
+module.exports.isNpmInstalled = isNpmInstalled;
 /*
  * A function that deletes the target from node_modules and runs npm uninstall
  *
