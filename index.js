@@ -42,6 +42,7 @@ module.exports = function (target, dest, opts) {
     var tree1;
     opts.production = opts.production || true;
     var nodeModulesDir = dest;
+    opts.save_exact = opts.save_exact || false;
 
     // check if npm is installed
     return module.exports.isNpmInstalled()
@@ -68,7 +69,10 @@ module.exports = function (target, dest, opts) {
             }
 
             // if user added --save flag, pass it to npm install command
-            if (opts.save) {
+            if (opts.save_exact) {
+                events.emit('verbose', 'saving exact');
+                fetchArgs.push('--save-exact');
+            } else if (opts.save) {
                 events.emit('verbose', 'saving');
                 fetchArgs.push('--save');
             } else {

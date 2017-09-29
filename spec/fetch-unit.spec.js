@@ -36,12 +36,25 @@ describe('unit tests for index.js', function () {
         var opts = { cwd: 'some/path', production: true, save: true};
         fetch('platform', 'tmpDir', opts)
             .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', [ 'install', 'platform', '--production', '--save'], jasmine.any(Object));
+                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
             })
             .fail(function (err) {
                 console.error(err);
                 expect(err).toBeUndefined();
             })
             .fin(done);
-    }, 600000);
+    });
+
+    it('save-exact should be true if passed in', function (done) {
+        var opts = { cwd: 'some/path', save_exact: true };
+        fetch('platform', 'tmpDir', opts)
+            .then(function (result) {
+                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/save-exact/), jasmine.any(Object));
+            })
+            .fail(function (err) {
+                console.error(err);
+                expect(err).toBeUndefined();
+            })
+            .fin(done);
+    });
 });
