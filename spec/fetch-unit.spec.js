@@ -57,4 +57,17 @@ describe('unit tests for index.js', function () {
             })
             .fin(done);
     });
+
+    it('noprod should turn production off', function (done) {
+        var opts = { cwd: 'some/path', production: false};
+        fetch('platform', 'tmpDir', opts)
+            .then(function (result) {
+                expect(superspawn.spawn).not.toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
+            })
+            .fail(function (err) {
+                console.error(err);
+                expect(err).toBeUndefined();
+            })
+            .fin(done);
+    });
 });
