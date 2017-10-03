@@ -33,10 +33,10 @@ describe('unit tests for index.js', function () {
     });
 
     it('npm install should be called with production flag (default)', function (done) {
-        var opts = { cwd: 'some/path', production: true };
+        var opts = { cwd: 'some/path', production: true, save: true};
         fetch('platform', 'tmpDir', opts)
             .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', [ 'install', 'platform', '--production' ], jasmine.any(Object));
+                expect(superspawn.spawn).toHaveBeenCalledWith('npm', [ 'install', 'platform', '--production', '--save'], jasmine.any(Object));
             })
             .fail(function (err) {
                 console.error(err);

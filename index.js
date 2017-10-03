@@ -41,6 +41,7 @@ module.exports = function (target, dest, opts) {
     opts = opts || {};
     var tree1;
     opts.production = opts.production || true;
+    var nodeModulesDir = dest;
 
     // check if npm is installed
     return module.exports.isNpmInstalled()
@@ -49,13 +50,13 @@ module.exports = function (target, dest, opts) {
                 // add target to fetchArgs Array
                 fetchArgs.push(target);
 
-                // append node_modules to dest if it doesn't come included
+                // append node_modules to nodeModulesDir if it doesn't come included
                 if (path.basename(dest) !== 'node_modules') {
-                    dest = path.resolve(path.join(dest, 'node_modules'));
+                    nodeModulesDir = path.resolve(path.join(dest, 'node_modules'));
                 }
-                // create dest if it doesn't exist
-                if (!fs.existsSync(dest)) {
-                    shell.mkdir('-p', dest);
+                // create node_modules if it doesn't exist
+                if (!fs.existsSync(nodeModulesDir)) {
+                    shell.mkdir('-p', nodeModulesDir);
                 }
             } else return Q.reject(new CordovaError('Need to supply a target and destination'));
 
@@ -70,10 +71,12 @@ module.exports = function (target, dest, opts) {
             if (opts.save) {
                 events.emit('verbose', 'saving');
                 fetchArgs.push('--save');
+            } else {
+                fetchArgs.push('--no-save');
             }
 
             // Grab json object of installed modules before npm install
-            return depls(dest);
+            return depls(nodeModulesDir);
         })
         .then(function (depTree) {
             tree1 = depTree;
@@ -83,7 +86,7 @@ module.exports = function (target, dest, opts) {
         })
         .then(function (output) {
             // Grab object of installed modules after npm install
-            return depls(dest);
+            return depls(nodeModulesDir);
         })
         .then(function (depTree2) {
             var tree2 = depTree2;
@@ -93,7 +96,7 @@ module.exports = function (target, dest, opts) {
             // This could happen on a platform update.
             var id = getJsonDiff(tree1, tree2) || trimID(target);
 
-            return module.exports.getPath(id, dest, target);
+            return module.exports.getPath(id, nodeModulesDir, target);
         })
         .fail(function (err) {
             return Q.reject(new CordovaError(err));
