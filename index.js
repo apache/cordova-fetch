@@ -40,9 +40,7 @@ module.exports = function (target, dest, opts) {
     var fetchArgs = opts.link ? ['link'] : ['install'];
     opts = opts || {};
     var tree1;
-    opts.production = opts.production || true;
     var nodeModulesDir = dest;
-    opts.save_exact = opts.save_exact || false;
 
     // check if npm is installed
     return module.exports.isNpmInstalled()
@@ -64,8 +62,10 @@ module.exports = function (target, dest, opts) {
             // set the directory where npm install will be run
             opts.cwd = dest;
             // npm should use production by default when install is npm run
-            if (opts.production) {
+
+            if ((opts.production) || (opts.production === undefined)) {
                 fetchArgs.push('--production');
+                opts.production = true;
             }
 
             // if user added --save flag, pass it to npm install command
@@ -78,7 +78,6 @@ module.exports = function (target, dest, opts) {
             } else {
                 fetchArgs.push('--no-save');
             }
-
             // Grab json object of installed modules before npm install
             return depls(nodeModulesDir);
         })
