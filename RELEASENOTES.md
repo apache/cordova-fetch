@@ -20,6 +20,18 @@
 -->
 # Cordova-fetch Release Notes
 
+### 1.2.0 (Oct 04, 2017)
+* [CB-13353](https://issues.apache.org/jira/browse/CB-13353) added `saveexact` as an option and updated fetch test
+* CB-13308, [CB-13252](https://issues.apache.org/jira/browse/CB-13252) fix issue with plugins turning into symlinks on restore
+* [CB-13303](https://issues.apache.org/jira/browse/CB-13303) setting production flag to true by default during npm install
+* [CB-12895](https://issues.apache.org/jira/browse/CB-12895) setting up `eslint` and removing `jshint`
+* [CB-13010](https://issues.apache.org/jira/browse/CB-13010) Improve logic for searching packages which being installed from `git url`
+* [CB-11980](https://issues.apache.org/jira/browse/CB-11980) fixed incorrect `appveyor` image
+* [CB-12786](https://issues.apache.org/jira/browse/CB-12786) Improve logic for searching plugin id in case of module already exists in `node_modules`
+* [CB-12762](https://issues.apache.org/jira/browse/CB-12762) updated `packageJson` to github mirrors
+* [CB-12787](https://issues.apache.org/jira/browse/CB-12787) Fix plugin installation with `--link` option
+* [CB-12738](https://issues.apache.org/jira/browse/CB-12738) Cordova ignores plugin dependency version on **windows** platform
+
 ### 1.1.0 (May 02, 2017)
 * [CB-12665](https://issues.apache.org/jira/browse/CB-12665): removed `enginestrict` since it is deprecated
 * added support for dealing with local path targets
