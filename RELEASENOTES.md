@@ -22,7 +22,7 @@
 
 ### 1.2.0 (Oct 04, 2017)
 * [CB-13353](https://issues.apache.org/jira/browse/CB-13353) added `saveexact` as an option and updated fetch test
-* CB-13308, [CB-13252](https://issues.apache.org/jira/browse/CB-13252) fix issue with plugins turning into symlinks on restore
+* [CB-13308](https://issues.apache.org/jira/browse/CB-13308), [CB-13252](https://issues.apache.org/jira/browse/CB-13252) fix issue with plugins turning into symlinks on restore
 * [CB-13303](https://issues.apache.org/jira/browse/CB-13303) setting production flag to true by default during npm install
 * [CB-12895](https://issues.apache.org/jira/browse/CB-12895) setting up `eslint` and removing `jshint`
 * [CB-13010](https://issues.apache.org/jira/browse/CB-13010) Improve logic for searching packages which being installed from `git url`
