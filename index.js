@@ -276,6 +276,8 @@ module.exports.uninstall = function (target, dest, opts) {
             // if user added --save flag, pass it to npm uninstall command
             if (opts.save) {
                 fetchArgs.push('--save');
+            } else {
+                fetchArgs.push('--no-save');
             }
 
             // run npm uninstall, this will remove dependency

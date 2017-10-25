@@ -70,4 +70,17 @@ describe('unit tests for index.js', function () {
             })
             .fin(done);
     });
+
+    it('when save is false, no-save flag should be passed through', function (done) {
+        var opts = { cwd: 'some/path', production: true, save: false};
+        fetch('platform', 'tmpDir', opts)
+            .then(function (result) {
+                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/--no-save/), jasmine.any(Object));
+            })
+            .fail(function (err) {
+                console.error(err);
+                expect(err).toBeUndefined();
+            })
+            .fin(done);
+    });
 });
