@@ -20,6 +20,12 @@
 -->
 # Cordova-fetch Release Notes
 
+### 1.2.1 (Oct 27, 2017)
+* [CB-13504](https://issues.apache.org/jira/browse/CB-13504) updating `package.json` versions for cordova-fetch 1.2.1 release
+* [CB-13501](https://issues.apache.org/jira/browse/CB-13501) : added support for node 8
+* [CB-13492](https://issues.apache.org/jira/browse/CB-13492) : updating opts.save and including a tests for no-save
+* [CB-13380](https://issues.apache.org/jira/browse/CB-13380) Incremented package version to -dev
+
 ### 1.2.0 (Oct 04, 2017)
 * [CB-13353](https://issues.apache.org/jira/browse/CB-13353) added `saveexact` as an option and updated fetch test
 * [CB-13308](https://issues.apache.org/jira/browse/CB-13308), [CB-13252](https://issues.apache.org/jira/browse/CB-13252) fix issue with plugins turning into symlinks on restore
