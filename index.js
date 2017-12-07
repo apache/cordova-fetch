@@ -25,6 +25,7 @@ var path = require('path');
 var fs = require('fs');
 var CordovaError = require('cordova-common').CordovaError;
 var isUrl = require('is-url');
+var hostedGitInfo = require('hosted-git-info');
 
 /*
  * A function that npm installs a module from npm or a git url
@@ -83,7 +84,7 @@ module.exports = function (target, dest, opts) {
         })
         .then(function (depTree) {
             tree1 = depTree;
-
+            console.log(fetchArgs);
             // install new module
             return superspawn.spawn('npm', fetchArgs, opts);
         })
@@ -98,7 +99,7 @@ module.exports = function (target, dest, opts) {
             // Need to use trimID in that case.
             // This could happen on a platform update.
             var id = getJsonDiff(tree1, tree2) || trimID(target);
-
+            console.log('id', id);
             return module.exports.getPath(id, nodeModulesDir, target);
         })
         .fail(function (err) {
@@ -118,20 +119,31 @@ module.exports = function (target, dest, opts) {
  *
  */
 function getJsonDiff (obj1, obj2) {
-    var result = '';
-
+    var result = [];
+    console.log(obj1);
+    console.log(obj2);
     // regex to filter out peer dependency warnings from result
     var re = /UNMET PEER DEPENDENCY/;
 
     for (var key in obj2) {
         // if it isn't a unmet peer dependency, continue
         if (key.search(re) === -1) {
-            if (obj2[key] !== obj1[key]) result = key;
+            if (obj2[key] !== obj1[key]) {
+                console.log('key', key);
+                result.push(key);
+            }
         }
     }
-    return result;
+    console.log(result);
+    console.log(result.length);
+    if (result.length > 1) {
+        console.log('result greater than 1');
+        //something went wrong if we have more than one module installed at a time
+        return false
+    }
+    // only return the first element
+    return result[0];
 }
-
 /*
  * Takes the specified target and returns the moduleID
  * If the git repoName is different than moduleID, then the
@@ -145,9 +157,13 @@ function getJsonDiff (obj1, obj2) {
  * @return {String} ID       moduleID without version.
  */
 function trimID (target) {
+    console.log('trimID', target);
     var parts;
     // If GITURL, set target to repo name
-    if (isUrl(target)) {
+    var gitInfo = hostedGitInfo.fromUrl(target);
+    if (gitInfo) {
+        target = gitInfo.project;
+    } else if (isUrl(target)) {
         // strip away .git and everything that follows
         var strippedTarget = target.split('.git');
         var re = /.*\/(.*)/;
@@ -196,7 +212,10 @@ function trimID (target) {
 
 function getPath (id, dest, target) {
     var destination = path.resolve(path.join(dest, id));
+    console.log('dest', destination);
+    console.log(shell.ls(dest));
     var finalDest = fs.existsSync(destination) ? destination : searchDirForTarget(dest, target);
+    console.log('finalDest', finalDest);
 
     if (!finalDest) {
         throw new CordovaError('Failed to get absolute path to installed module');

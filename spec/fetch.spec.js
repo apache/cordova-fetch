@@ -241,8 +241,8 @@ describe('test trimID method for npm and git', function () {
                 expect(fs.existsSync(result)).toBe(true);
                 expect(result).toMatch('cordova-plugin-device');
 
-                // refetch to trigger trimID
-                return fetch('https://github.com/apache/cordova-plugin-media.git', tmpDir, opts);
+                // refetch to trigger trimID, with shortcode URL
+                return fetch('github:apache/cordova-plugin-media', tmpDir, opts);
             })
             .then(function (result) {
                 expect(result).toBeDefined();
