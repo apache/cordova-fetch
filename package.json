@@ -23,6 +23,7 @@
   "dependencies": {
     "cordova-common": "2.1.1",
     "dependency-ls": "^1.1.0",
+    "hosted-git-info": "^2.5.0",
     "is-url": "^1.2.1",
     "q": "^1.4.1",
     "shelljs": "^0.7.0"

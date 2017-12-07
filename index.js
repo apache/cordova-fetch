@@ -25,6 +25,7 @@ var path = require('path');
 var fs = require('fs');
 var CordovaError = require('cordova-common').CordovaError;
 var isUrl = require('is-url');
+var hostedGitInfo = require('hosted-git-info');
 
 /*
  * A function that npm installs a module from npm or a git url
@@ -147,7 +148,10 @@ function getJsonDiff (obj1, obj2) {
 function trimID (target) {
     var parts;
     // If GITURL, set target to repo name
-    if (isUrl(target)) {
+    var gitInfo = hostedGitInfo.fromUrl(target);
+    if (gitInfo) {
+        target = gitInfo.project;
+    } else if (isUrl(target)) {
         // strip away .git and everything that follows
         var strippedTarget = target.split('.git');
         var re = /.*\/(.*)/;
