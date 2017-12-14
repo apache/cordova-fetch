@@ -20,6 +20,10 @@
 -->
 # Cordova-fetch Release Notes
 
+### 1.3.0 (Dec 14, 2017)
+* [CB-13055](https://issues.apache.org/jira/browse/CB-13055): added workaround for when `jsonDiff` has more than one different key. 
+* Support git shortlink package references
+
 ### 1.2.1 (Oct 27, 2017)
 * [CB-13504](https://issues.apache.org/jira/browse/CB-13504) updating `package.json` versions for cordova-fetch 1.2.1 release
 * [CB-13501](https://issues.apache.org/jira/browse/CB-13501) : added support for node 8
