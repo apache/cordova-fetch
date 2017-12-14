@@ -84,7 +84,6 @@ module.exports = function (target, dest, opts) {
         })
         .then(function (depTree) {
             tree1 = depTree;
-
             // install new module
             return superspawn.spawn('npm', fetchArgs, opts);
         })
@@ -99,7 +98,6 @@ module.exports = function (target, dest, opts) {
             // Need to use trimID in that case.
             // This could happen on a platform update.
             var id = getJsonDiff(tree1, tree2) || trimID(target);
-
             return module.exports.getPath(id, nodeModulesDir, target);
         })
         .fail(function (err) {
@@ -119,20 +117,25 @@ module.exports = function (target, dest, opts) {
  *
  */
 function getJsonDiff (obj1, obj2) {
-    var result = '';
-
+    var result = [];
     // regex to filter out peer dependency warnings from result
     var re = /UNMET PEER DEPENDENCY/;
 
     for (var key in obj2) {
         // if it isn't a unmet peer dependency, continue
         if (key.search(re) === -1) {
-            if (obj2[key] !== obj1[key]) result = key;
+            if (obj2[key] !== obj1[key]) {
+                result.push(key);
+            }
         }
     }
-    return result;
+    if (result.length > 1) {
+        // something went wrong if we have more than one module installed at a time
+        return false;
+    }
+    // only return the first element
+    return result[0];
 }
-
 /*
  * Takes the specified target and returns the moduleID
  * If the git repoName is different than moduleID, then the
