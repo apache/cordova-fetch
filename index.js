@@ -25,6 +25,7 @@ var path = require('path');
 var fs = require('fs');
 var CordovaError = require('cordova-common').CordovaError;
 var isUrl = require('is-url');
+var isGitUrl = require('is-git-url');
 var hostedGitInfo = require('hosted-git-info');
 
 /*
@@ -154,7 +155,7 @@ function trimID (target) {
     var gitInfo = hostedGitInfo.fromUrl(target);
     if (gitInfo) {
         target = gitInfo.project;
-    } else if (isUrl(target)) {
+    } else if (isUrl(target) || isGitUrl(target)) {
         // strip away .git and everything that follows
         var strippedTarget = target.split('.git');
         var re = /.*\/(.*)/;
