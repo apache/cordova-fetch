@@ -283,6 +283,25 @@ describe('test trimID method for npm and git', function () {
             })
             .fin(done);
     }, 30000);
+
+    it('should fetch from git+http successfully', function (done) {
+        fetch('git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git', tmpDir, opts)
+            .then(function () {
+                // refetch to trigger trimID
+                return fetch('git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git', tmpDir, opts);
+            })
+            .then(function (result) {
+                var pkgJSON = require(path.join(result, 'package.json'));
+                expect(result).toBeDefined();
+                expect(fs.existsSync(result)).toBe(true);
+                expect(pkgJSON.name).toBe('cordova-plugin-dialogs');
+            })
+            .fail(function (err) {
+                console.error(err);
+                expect(err).toBeUndefined();
+            })
+            .fin(done);
+    }, 30000);
 });
 
 describe('fetch failure with unknown module', function () {
