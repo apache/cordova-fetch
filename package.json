@@ -25,6 +25,7 @@
     "dependency-ls": "^1.1.0",
     "hosted-git-info": "^2.5.0",
     "is-url": "^1.2.1",
+    "is-git-url": "^1.0.0",
     "q": "^1.4.1",
     "shelljs": "^0.7.0"
   },
