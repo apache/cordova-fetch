@@ -208,6 +208,7 @@ describe('test trimID method for npm and git', function () {
 
     beforeEach(function () {
         tmpDir = helpers.tmpDir('plug_trimID');
+        shell.cp('-R', 'spec/support', path.join(tmpDir, 'support'));
         process.chdir(tmpDir);
     });
 
@@ -276,6 +277,26 @@ describe('test trimID method for npm and git', function () {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(result).toMatch('cordova-plugin-ms-adal');
+            })
+            .fail(function (err) {
+                console.error(err);
+                expect(err).toBeUndefined();
+            })
+            .fin(done);
+    }, 30000);
+
+    it('should fetch same plugin twice in a row if using a relative path', function (done) {
+        fetch('file:support/dummy-local-plugin', tmpDir, opts)
+            .then(function (result) {
+                expect(result).toBeDefined();
+                expect(fs.existsSync(result)).toBe(true);
+                expect(result).toMatch('test-plugin');
+                return fetch('file:support/dummy-local-plugin', tmpDir, opts);
+            })
+            .then(function (result) {
+                expect(result).toBeDefined();
+                expect(fs.existsSync(result)).toBe(true);
+                expect(result).toMatch('test-plugin');
             })
             .fail(function (err) {
                 console.error(err);

@@ -1,0 +1,9 @@
+{
+  "name": "test-plugin",
+  "version": "1.0.0",
+  "description": "This plugin allows you to stream audio and video in a fullscreen, native player on iOS and Android.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
