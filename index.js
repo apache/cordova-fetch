@@ -145,7 +145,7 @@ function getJsonDiff (obj1, obj2) {
  * get the moduleID of the installed module.
  *
  * @param {String} target    target that was passed into cordova-fetch.
- *                           can be moduleID, moduleID@version or gitURL
+ *                           can be moduleID, moduleID@version, gitURL or relative path (file:relative/path)
  *
  * @return {String} ID       moduleID without version.
  */
@@ -166,6 +166,11 @@ function trimID (target) {
     }
 
     // If local path exists, try to get plugin id from package.json or set target to final directory
+    if (target.startsWith('file:')) {
+        // If target starts with file: prefix, strip it
+        target = target.substring(5);
+    }
+
     if (fs.existsSync(target)) {
         var pluginId;
         var pkgJsonPath = path.join(target, 'package.json');
