@@ -29,7 +29,7 @@ var isGitUrl = require('is-git-url');
 var hostedGitInfo = require('hosted-git-info');
 
 /*
- * A function that npm installs a module from npm or a git url
+ * A function that installs a module from package manager or a git url
  *
  * @param {String} target   the packageID or git url
  * @param {String} dest     destination of where to install the module
@@ -39,13 +39,13 @@ var hostedGitInfo = require('hosted-git-info');
  *
  */
 module.exports = function (target, dest, opts) {
-    var fetchArgs = opts.link ? ['link'] : ['install'];
     opts = opts || {};
+    var manager = opts.manager || 'npm';
+    var fetchArgs = opts.link ? ['link'] : manager === 'yarn' ? ['add'] : ['install'];
     var tree1;
     var nodeModulesDir = dest;
 
-    // check if npm is installed
-    return module.exports.isNpmInstalled()
+    return isPackageManagerInstalled(manager)
         .then(function () {
             if (dest && target) {
                 // add target to fetchArgs Array
@@ -61,16 +61,16 @@ module.exports = function (target, dest, opts) {
                 }
             } else return Q.reject(new CordovaError('Need to supply a target and destination'));
 
-            // set the directory where npm install will be run
+            // set the directory where install command will be run
             opts.cwd = dest;
-            // npm should use production by default when install is npm run
+            // package manager should use production by default when install command is run
 
             if ((opts.production) || (opts.production === undefined)) {
                 fetchArgs.push('--production');
                 opts.production = true;
             }
 
-            // if user added --save flag, pass it to npm install command
+            // if user added --save flag, pass it to install command
             if (opts.save_exact) {
                 events.emit('verbose', 'saving exact');
                 fetchArgs.push('--save-exact');
@@ -80,16 +80,16 @@ module.exports = function (target, dest, opts) {
             } else {
                 fetchArgs.push('--no-save');
             }
-            // Grab json object of installed modules before npm install
+            // Grab json object of installed modules before install command
             return depls(nodeModulesDir);
         })
         .then(function (depTree) {
             tree1 = depTree;
             // install new module
-            return superspawn.spawn('npm', fetchArgs, opts);
+            return superspawn.spawn(manager, fetchArgs, opts);
         })
         .then(function (output) {
-            // Grab object of installed modules after npm install
+            // Grab object of installed modules after install command
             return depls(nodeModulesDir);
         })
         .then(function (depTree2) {
@@ -111,8 +111,8 @@ module.exports = function (target, dest, opts) {
  * If a module already exists in node_modules, the diff will be blank.
  * cordova-fetch will use trimID in that case.
  *
- * @param {Object} obj1     json object representing installed modules before latest npm install
- * @param {Object} obj2     json object representing installed modules after latest npm install
+ * @param {Object} obj1     json object representing installed modules before latest install command
+ * @param {Object} obj2     json object representing installed modules after latest install command
  *
  * @return {String}         String containing the key value of the difference between the two objects
  *
@@ -137,6 +137,7 @@ function getJsonDiff (obj1, obj2) {
     // only return the first element
     return result[0];
 }
+
 /*
  * Takes the specified target and returns the moduleID
  * If the git repoName is different than moduleID, then the
@@ -206,7 +207,6 @@ function trimID (target) {
  * @return {String|Error}  Returns the absolute url for the module or throws a error
  *
  */
-
 function getPath (id, dest, target) {
     var destination = path.resolve(path.join(dest, id));
     var finalDest = fs.existsSync(destination) ? destination : searchDirForTarget(dest, target);
@@ -219,6 +219,7 @@ function getPath (id, dest, target) {
 }
 
 module.exports.getPath = getPath;
+
 /*
  * Make an additional search in destination folder using repository.url property from package.json
  *
@@ -228,7 +229,6 @@ module.exports.getPath = getPath;
  * @return {String}         Returns the absolute url for the module or null
  *
  */
-
 function searchDirForTarget (dest, target) {
     if (!isUrl(target)) {
         return;
@@ -252,50 +252,76 @@ function searchDirForTarget (dest, target) {
  * Checks to see if npm is installed on the users system
  * @return {Promise|Error} Returns true or a cordova error.
  */
-
 function isNpmInstalled () {
-    if (!shell.which('npm')) {
-        return Q.reject(new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.'));
+    return isPackageManagerInstalled('npm');
+}
+
+module.exports.isNpmInstalled = isNpmInstalled;
+
+/*
+ * Checks to see if yarn is installed on the users system
+ * @return {Promise|Error} Returns true or a cordova error.
+ */
+function isYarnInstalled () {
+    return isPackageManagerInstalled('yarn');
+}
+
+module.exports.isYarnInstalled = isYarnInstalled;
+
+/*
+ * Checks to see if selected package manager is installed on the users system
+ * @return {Promise|Error} Returns true or a cordova error.
+ */
+function isPackageManagerInstalled (manager) {
+    if (!shell.which(manager)) {
+        return Q.reject(new CordovaError('"' + manager + '" command line tool is not installed: make sure it is accessible on your PATH.'));
     }
     return Q();
 }
 
-module.exports.isNpmInstalled = isNpmInstalled;
+module.exports.isPackageManagerInstalled = isPackageManagerInstalled;
+
 /*
- * A function that deletes the target from node_modules and runs npm uninstall
+ * A function that deletes the target from node_modules and runs uninstall command
  *
  * @param {String} target   the packageID
  * @param {String} dest     destination of where to uninstall the module from
- * @param {Object} opts     [opts={save:true}] options to pass to npm uninstall
+ * @param {Object} opts     [opts={save:true}] options to pass to uninstall command
  *
- * @return {Promise|Error}    Returns a promise with the npm uninstall output or an error.
+ * @return {Promise|Error}    Returns a promise with the uninstall command output or an error.
  *
  */
 module.exports.uninstall = function (target, dest, opts) {
-    var fetchArgs = ['uninstall'];
     opts = opts || {};
+    var manager = opts.manager || 'npm';
+    var fetchArgs = [];
 
-    // check if npm is installed on the system
-    return isNpmInstalled()
+    if (manager === 'npm') {
+        fetchArgs.push('uninstall');
+    } else if (manager === 'yarn') {
+        fetchArgs.push('remove');
+    }
+
+    return isPackageManagerInstalled(manager)
         .then(function () {
             if (dest && target) {
                 // add target to fetchArgs Array
                 fetchArgs.push(target);
             } else return Q.reject(new CordovaError('Need to supply a target and destination'));
 
-            // set the directory where npm uninstall will be run
+            // set the directory where uninstall will be run
             opts.cwd = dest;
 
-            // if user added --save flag, pass it to npm uninstall command
+            // if user added --save flag, pass it to uninstall command
             if (opts.save) {
                 fetchArgs.push('--save');
             } else {
                 fetchArgs.push('--no-save');
             }
 
-            // run npm uninstall, this will remove dependency
+            // run uninstall command, this will remove dependency
             // from package.json if --save was used.
-            return superspawn.spawn('npm', fetchArgs, opts);
+            return superspawn.spawn(manager, fetchArgs, opts);
         })
         .then(function (res) {
             var pluginDest = path.join(dest, 'node_modules', target);

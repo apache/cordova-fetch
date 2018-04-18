@@ -27,16 +27,17 @@ describe('unit tests for index.js', function () {
         spyOn(superspawn, 'spawn').and.returnValue(true);
         spyOn(shell, 'mkdir').and.returnValue(true);
         spyOn(shell, 'which').and.returnValue(Q());
+        spyOn(fetch, 'isPackageManagerInstalled').and.returnValue(Q());
         spyOn(fetch, 'isNpmInstalled').and.returnValue(Q());
+        spyOn(fetch, 'isYarnInstalled').and.returnValue(Q());
         spyOn(fetch, 'getPath').and.returnValue('some/path');
         spyOn(fs, 'existsSync').and.returnValue(false);
     });
 
-    it('npm install should be called with production flag (default)', function (done) {
-        var opts = { cwd: 'some/path', production: true, save: true};
-        fetch('platform', 'tmpDir', opts)
+    it('npm should be the default package manager', function (done) {
+        fetch('platform', 'tmpDir')
             .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
+                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.any(Array), jasmine.any(Object));
             })
             .fail(function (err) {
                 console.error(err);
@@ -45,42 +46,57 @@ describe('unit tests for index.js', function () {
             .fin(done);
     });
 
-    it('save-exact should be true if passed in', function (done) {
-        var opts = { cwd: 'some/path', save_exact: true };
-        fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/save-exact/), jasmine.any(Object));
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
-    });
+    ['npm', 'yarn'].forEach(function(manager) {
+        it(manager + ' install should be called with production flag (default)', function (done) {
+            var opts = { cwd: 'some/path', production: true, save: true, manager: manager };
+            fetch('platform', 'tmpDir', opts)
+                .then(function (result) {
+                    expect(superspawn.spawn).toHaveBeenCalledWith(manager, jasmine.stringMatching(/production/), jasmine.any(Object));
+                })
+                .fail(function (err) {
+                    console.error(err);
+                    expect(err).toBeUndefined();
+                })
+                .fin(done);
+        });
 
-    it('noprod should turn production off', function (done) {
-        var opts = { cwd: 'some/path', production: false};
-        fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).not.toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
-    });
+        it('save-exact should be true if passed in', function (done) {
+            var opts = { cwd: 'some/path', save_exact: true, manager: manager };
+            fetch('platform', 'tmpDir', opts)
+                .then(function (result) {
+                    expect(superspawn.spawn).toHaveBeenCalledWith(manager, jasmine.stringMatching(/save-exact/), jasmine.any(Object));
+                })
+                .fail(function (err) {
+                    console.error(err);
+                    expect(err).toBeUndefined();
+                })
+                .fin(done);
+        });
 
-    it('when save is false, no-save flag should be passed through', function (done) {
-        var opts = { cwd: 'some/path', production: true, save: false};
-        fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/--no-save/), jasmine.any(Object));
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+        it('noprod should turn production off', function (done) {
+            var opts = { cwd: 'some/path', production: false, manager: manager };
+            fetch('platform', 'tmpDir', opts)
+                .then(function (result) {
+                    expect(superspawn.spawn).not.toHaveBeenCalledWith(manager, jasmine.stringMatching(/production/), jasmine.any(Object));
+                })
+                .fail(function (err) {
+                    console.error(err);
+                    expect(err).toBeUndefined();
+                })
+                .fin(done);
+        });
+
+        it('when save is false, no-save flag should be passed through', function (done) {
+            var opts = { cwd: 'some/path', production: true, save: false, manager: manager };
+            fetch('platform', 'tmpDir', opts)
+                .then(function (result) {
+                    expect(superspawn.spawn).toHaveBeenCalledWith(manager, jasmine.stringMatching(/--no-save/), jasmine.any(Object));
+                })
+                .fail(function (err) {
+                    console.error(err);
+                    expect(err).toBeUndefined();
+                })
+                .fin(done);
+        });
     });
 });
