@@ -277,9 +277,8 @@ describe('fetch failure with unknown module', function () {
     it('should fail fetching a module that does not exist on npm', function () {
         return fetch('NOTAMODULE', tmpDir, opts)
             .then(function (result) {
-                console.log('This should fail and it should not be seen');
-            })
-            .fail(function (err) {
+                fail('Expected promise to be rejected');
+            }, function (err) {
                 expect(err.message.code).toBe(1);
                 expect(err).toBeDefined();
             });
@@ -303,9 +302,8 @@ describe('fetch failure with git subdirectory', function () {
     it('should fail fetching a giturl which contains a subdirectory', function () {
         return fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
             .then(function (result) {
-                console.log('This should fail and it should not be seen');
-            })
-            .fail(function (err) {
+                fail('Expected promise to be rejected');
+            }, function (err) {
                 expect(err.message.code).toBe(1);
                 expect(err).toBeDefined();
             });
