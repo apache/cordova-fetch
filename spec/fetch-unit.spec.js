@@ -33,7 +33,7 @@ describe('unit tests for index.js', function () {
     });
 
     it('npm install should be called with production flag (default)', function (done) {
-        var opts = { cwd: 'some/path', production: true, save: true};
+        var opts = { cwd: 'some/path', production: true, save: true };
         fetch('platform', 'tmpDir', opts)
             .then(function (result) {
                 expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
@@ -59,7 +59,7 @@ describe('unit tests for index.js', function () {
     });
 
     it('noprod should turn production off', function (done) {
-        var opts = { cwd: 'some/path', production: false};
+        var opts = { cwd: 'some/path', production: false };
         fetch('platform', 'tmpDir', opts)
             .then(function (result) {
                 expect(superspawn.spawn).not.toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
@@ -72,7 +72,7 @@ describe('unit tests for index.js', function () {
     });
 
     it('when save is false, no-save flag should be passed through', function (done) {
-        var opts = { cwd: 'some/path', production: true, save: false};
+        var opts = { cwd: 'some/path', production: true, save: false };
         fetch('platform', 'tmpDir', opts)
             .then(function (result) {
                 expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/--no-save/), jasmine.any(Object));
