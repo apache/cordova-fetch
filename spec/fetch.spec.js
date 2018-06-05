@@ -37,9 +37,9 @@ describe('platform fetch/uninstall tests via npm & git', function () {
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fetch and uninstall a cordova platform via npm & git', function (done) {
+    it('should fetch and uninstall a cordova platform via npm & git', function () {
 
-        fetch('cordova-android', tmpDir, opts)
+        return fetch('cordova-android', tmpDir, opts)
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
@@ -73,12 +73,7 @@ describe('platform fetch/uninstall tests via npm & git', function () {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-browser');
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 60000);
 });
 
@@ -98,8 +93,8 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fetch and uninstall a cordova platform via npm & git tags/branches', function (done) {
-        fetch('cordova-android@5.1.1', tmpDir, opts)
+    it('should fetch and uninstall a cordova platform via npm & git tags/branches', function () {
+        return fetch('cordova-android@5.1.1', tmpDir, opts)
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
@@ -149,12 +144,7 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
                 expect(rootPJ.dependencies['cordova-android']).toBe('git+https://github.com/apache/cordova-android.git#4.1.x');
 
                 return uninstall('cordova-android', tmpDir, opts);
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 150000);
 });
 
@@ -174,8 +164,8 @@ describe('plugin fetch/uninstall test with --save', function () {
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fetch and uninstall a cordova plugin via git commit sha', function (done) {
-        fetch('https://github.com/apache/cordova-plugin-contacts.git#7db612115755c2be73a98dda76ff4c5fd9d8a575', tmpDir, opts)
+    it('should fetch and uninstall a cordova plugin via git commit sha', function () {
+        return fetch('https://github.com/apache/cordova-plugin-contacts.git#7db612115755c2be73a98dda76ff4c5fd9d8a575', tmpDir, opts)
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
@@ -192,12 +182,7 @@ describe('plugin fetch/uninstall test with --save', function () {
                 var rootPJ = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf8'));
                 expect(Object.keys(rootPJ.dependencies).length).toBe(0);
                 expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-plugin-contacts'))).toBe(false);
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 30000);
 });
 
@@ -217,8 +202,8 @@ describe('test trimID method for npm and git', function () {
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fetch the same cordova plugin twice in a row', function (done) {
-        fetch('cordova-plugin-device', tmpDir, opts)
+    it('should fetch the same cordova plugin twice in a row', function () {
+        return fetch('cordova-plugin-device', tmpDir, opts)
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
@@ -257,16 +242,11 @@ describe('test trimID method for npm and git', function () {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(result).toMatch('cordova-plugin-media');
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 40000);
 
-    it('should fetch same plugin twice in a row if git repo name differ from plugin id', function (done) {
-        fetch('https://github.com/AzureAD/azure-activedirectory-library-for-cordova.git', tmpDir, opts)
+    it('should fetch same plugin twice in a row if git repo name differ from plugin id', function () {
+        return fetch('https://github.com/AzureAD/azure-activedirectory-library-for-cordova.git', tmpDir, opts)
             .then(function (result) {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
@@ -277,16 +257,11 @@ describe('test trimID method for npm and git', function () {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(result).toMatch('cordova-plugin-ms-adal');
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 30000);
 
-    it('should fetch same plugin twice in a row if using a relative path', function (done) {
-        fetch('file:support/dummy-local-plugin', tmpDir, opts)
+    it('should fetch same plugin twice in a row if using a relative path', function () {
+        return fetch('file:support/dummy-local-plugin', tmpDir, opts)
             .then(function (result) {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
@@ -297,16 +272,11 @@ describe('test trimID method for npm and git', function () {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(result).toMatch('test-plugin');
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 30000);
 
-    it('should fetch from git+http successfully', function (done) {
-        fetch('git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git', tmpDir, opts)
+    it('should fetch from git+http successfully', function () {
+        return fetch('git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git', tmpDir, opts)
             .then(function () {
                 // refetch to trigger trimID
                 return fetch('git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git', tmpDir, opts);
@@ -316,12 +286,7 @@ describe('test trimID method for npm and git', function () {
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-plugin-dialogs');
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 30000);
 });
 
@@ -339,16 +304,15 @@ describe('fetch failure with unknown module', function () {
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fail fetching a module that does not exist on npm', function (done) {
-        fetch('NOTAMODULE', tmpDir, opts)
+    it('should fail fetching a module that does not exist on npm', function () {
+        return fetch('NOTAMODULE', tmpDir, opts)
             .then(function (result) {
                 console.log('This should fail and it should not be seen');
             })
             .fail(function (err) {
                 expect(err.message.code).toBe(1);
                 expect(err).toBeDefined();
-            })
-            .fin(done);
+            });
     }, 30000);
 });
 
@@ -366,16 +330,15 @@ describe('fetch failure with git subdirectory', function () {
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fail fetching a giturl which contains a subdirectory', function (done) {
-        fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
+    it('should fail fetching a giturl which contains a subdirectory', function () {
+        return fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
             .then(function (result) {
                 console.log('This should fail and it should not be seen');
             })
             .fail(function (err) {
                 expect(err.message.code).toBe(1);
                 expect(err).toBeDefined();
-            })
-            .fin(done);
+            });
     }, 30000);
 });
 
@@ -393,18 +356,13 @@ describe('scoped plugin fetch/uninstall tests via npm', function () {
         shell.rm('-rf', tmpDir);
     });
 
-    it('should fetch a scoped plugin from npm', function (done) {
-        fetch('@stevegill/cordova-plugin-device', tmpDir, opts)
+    it('should fetch a scoped plugin from npm', function () {
+        return fetch('@stevegill/cordova-plugin-device', tmpDir, opts)
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('@stevegill/cordova-plugin-device');
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+            });
     }, 30000);
 });
