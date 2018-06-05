@@ -59,7 +59,7 @@ module.exports = function (target, dest, opts) {
                 if (!fs.existsSync(nodeModulesDir)) {
                     shell.mkdir('-p', nodeModulesDir);
                 }
-            } else return Q.reject(new CordovaError('Need to supply a target and destination'));
+            } else throw new CordovaError('Need to supply a target and destination');
 
             // set the directory where npm install will be run
             opts.cwd = dest;
@@ -101,8 +101,8 @@ module.exports = function (target, dest, opts) {
             var id = getJsonDiff(tree1, tree2) || trimID(target);
             return module.exports.getPath(id, nodeModulesDir, target);
         })
-        .fail(function (err) {
-            return Q.reject(new CordovaError(err));
+        .catch(function (err) {
+            throw new CordovaError(err);
         });
 };
 
@@ -254,10 +254,12 @@ function searchDirForTarget (dest, target) {
  */
 
 function isNpmInstalled () {
-    if (!shell.which('npm')) {
-        return Q.reject(new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.'));
-    }
-    return Q();
+    return Q.Promise(function (resolve) {
+        if (!shell.which('npm')) {
+            throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
+        }
+        resolve();
+    });
 }
 
 module.exports.isNpmInstalled = isNpmInstalled;
@@ -281,7 +283,7 @@ module.exports.uninstall = function (target, dest, opts) {
             if (dest && target) {
                 // add target to fetchArgs Array
                 fetchArgs.push(target);
-            } else return Q.reject(new CordovaError('Need to supply a target and destination'));
+            } else throw new CordovaError('Need to supply a target and destination');
 
             // set the directory where npm uninstall will be run
             opts.cwd = dest;
@@ -304,7 +306,7 @@ module.exports.uninstall = function (target, dest, opts) {
             }
             return res;
         })
-        .fail(function (err) {
-            return Q.reject(new CordovaError(err));
+        .catch(function (err) {
+            throw new CordovaError(err);
         });
 };
