@@ -74,7 +74,7 @@ describe('platform fetch/uninstall tests via npm & git', function () {
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-browser');
             });
-    }, 60000);
+    }, 120000);
 });
 
 describe('platform fetch/uninstall test via npm & git tags with --save', function () {
@@ -258,7 +258,7 @@ describe('test trimID method for npm and git', function () {
                 expect(fs.existsSync(result)).toBe(true);
                 expect(result).toMatch('cordova-plugin-ms-adal');
             });
-    }, 30000);
+    }, 120000);
 
     it('should fetch same plugin twice in a row if using a relative path', function () {
         return fetch('file:support/dummy-local-plugin', tmpDir, opts)
@@ -273,7 +273,7 @@ describe('test trimID method for npm and git', function () {
                 expect(fs.existsSync(result)).toBe(true);
                 expect(result).toMatch('test-plugin');
             });
-    }, 30000);
+    }, 60000);
 
     it('should fetch from git+http successfully', function () {
         return fetch('git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git', tmpDir, opts)
