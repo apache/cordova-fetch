@@ -23,11 +23,10 @@ var superspawn = require('cordova-common').superspawn;
 
 describe('unit tests for index.js', function () {
     beforeEach(function () {
-        spyOn(superspawn, 'spawn').and.returnValue(true);
+        spyOn(superspawn, 'spawn').and.returnValue('+ foo@1.2.3');
         spyOn(shell, 'mkdir').and.returnValue(true);
         spyOn(shell, 'which').and.returnValue(Promise.resolve());
         spyOn(fetch, 'isNpmInstalled').and.returnValue(Promise.resolve());
-        spyOn(fetch, 'getPath').and.returnValue('some/path');
         spyOn(fs, 'existsSync').and.returnValue(false);
     });
 
