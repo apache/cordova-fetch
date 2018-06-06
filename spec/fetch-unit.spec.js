@@ -15,9 +15,6 @@
     under the License.
 */
 
-/* eslint-env jasmine */
-/* eslint-disable prefer-promise-reject-errors */
-
 const rewire = require('rewire');
 
 describe('fetch', function () {

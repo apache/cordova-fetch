@@ -15,8 +15,6 @@
     under the License.
 */
 
-/* eslint-env jasmine */
-
 var fetch = require('..');
 var uninstall = fetch.uninstall;
 
