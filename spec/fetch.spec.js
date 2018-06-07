@@ -74,7 +74,7 @@ describe('platform fetch/uninstall tests via npm & git', function () {
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-browser');
             });
-    }, 60000);
+    }, 120000);
 });
 
 describe('platform fetch/uninstall test via npm & git tags with --save', function () {
