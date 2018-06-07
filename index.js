@@ -38,9 +38,8 @@ var hostedGitInfo = require('hosted-git-info');
  * @return {String|Promise}    Returns string of the absolute path to the installed module.
  *
  */
-module.exports = function (target, dest, opts) {
+module.exports = function (target, dest, opts = {}) {
     var fetchArgs = opts.link ? ['link'] : ['install'];
-    opts = opts || {};
     var tree1;
     var nodeModulesDir = dest;
 
