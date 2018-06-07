@@ -145,9 +145,12 @@ function resolvePathToPackage (name, basedir) {
  * @return {Promise<string>} Absolute path to npm.
  */
 function isNpmInstalled () {
-    return which('npm').catch(_ => {
-        throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
-    });
+    if (!isNpmInstalled._cache) {
+        isNpmInstalled._cache = which('npm').catch(_ => {
+            throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
+        });
+    }
+    return isNpmInstalled._cache;
 }
 
 module.exports.isNpmInstalled = isNpmInstalled;
