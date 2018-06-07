@@ -31,6 +31,10 @@ describe('unit tests for index.js', function () {
         spyOn(fs, 'existsSync').and.returnValue(false);
     });
 
+    it('should handle missing options', function () {
+        return fetch('platform', 'tmpDir');
+    });
+
     it('npm install should be called with production flag (default)', function () {
         var opts = { cwd: 'some/path', production: true, save: true };
         return fetch('platform', 'tmpDir', opts)
