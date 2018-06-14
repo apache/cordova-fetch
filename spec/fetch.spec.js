@@ -18,9 +18,8 @@
 /* eslint-env jasmine */
 var fetch = require('../index.js');
 var uninstall = require('../index.js').uninstall;
-var shell = require('shelljs');
 var path = require('path');
-var fs = require('fs');
+var fs = require('fs-extra');
 var helpers = require('./helpers.js');
 
 var tmpDir;
@@ -32,7 +31,7 @@ beforeEach(function () {
 
 afterEach(function () {
     process.chdir(__dirname); // Needed to rm the dir on Windows.
-    shell.rm('-rf', tmpDir);
+    fs.removeSync(tmpDir);
 });
 
 describe('platform fetch/uninstall tests via npm & git', function () {
@@ -85,7 +84,7 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
 
     beforeEach(function () {
         // copy package.json from spec directory to tmpDir
-        shell.cp(path.join(__dirname, 'testpkg.json'), 'package.json');
+        fs.copySync(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
     it('should fetch and uninstall a cordova platform via npm & git tags/branches', function () {
@@ -149,7 +148,7 @@ describe('plugin fetch/uninstall test with --save', function () {
 
     beforeEach(function () {
         // copy package.json from spec directory to tmpDir
-        shell.cp(path.join(__dirname, 'testpkg.json'), 'package.json');
+        fs.copySync(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
     it('should fetch and uninstall a cordova plugin via git commit sha', function () {
@@ -179,7 +178,7 @@ describe('test trimID method for npm and git', function () {
     var opts = {};
 
     beforeEach(function () {
-        shell.cp('-r', path.join(__dirname, 'support'), 'support');
+        fs.copySync(path.join(__dirname, 'support'), 'support');
     });
 
     it('should fetch the same cordova plugin twice in a row', function () {
