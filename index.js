@@ -155,13 +155,6 @@ module.exports.uninstall = function (target, dest, opts) {
             // from package.json if --save was used.
             return superspawn.spawn('npm', fetchArgs, opts);
         })
-        .then(function (res) {
-            var pluginDest = path.join(dest, 'node_modules', target);
-            if (fs.existsSync(pluginDest)) {
-                shell.rm('-rf', pluginDest);
-            }
-            return res;
-        })
         .catch(function (err) {
             throw new CordovaError(err);
         });
