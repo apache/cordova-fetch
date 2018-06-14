@@ -26,15 +26,15 @@ const { getInstalledPath } = require('get-installed-path');
 const npa = require('npm-package-arg');
 const semver = require('semver');
 
-/*
- * A function that npm installs a module from npm or a git url
+/**
+ * Installs a module from npm, a git url or the local file system.
  *
- * @param {String} target   the packageID or git url
- * @param {String} dest     destination of where to install the module
- * @param {Object} opts     [opts={save:true}] options to pass to fetch module
+ * @param {String} target       A spec for the package to be installed
+ *                              (anything supported by `npm install`)
+ * @param {String} dest         Location where to install the package
+ * @param {Object} [opts={}]    Additional options
  *
- * @return {String|Promise}    Returns string of the absolute path to the installed module.
- *
+ * @return {Promise<string>}    Absolute path to the installed package
  */
 module.exports = function (target, dest, opts = {}) {
     return Q()
@@ -111,11 +111,11 @@ function pathToInstalledPackage (spec, dest) {
         });
 }
 
-/*
+/**
  * Checks to see if npm is installed on the users system
- * @return {Promise|Error} Returns true or a cordova error.
+ *
+ * @return {Promise<string>} Absolute path to npm.
  */
-
 function isNpmInstalled () {
     return which('npm').catch(_ => {
         throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
@@ -123,15 +123,15 @@ function isNpmInstalled () {
 }
 
 module.exports.isNpmInstalled = isNpmInstalled;
-/*
- * A function that deletes the target from node_modules and runs npm uninstall
+
+/**
+ * Uninstalls the package `target` from `dest` using given options.
  *
- * @param {String} target   the packageID
- * @param {String} dest     destination of where to uninstall the module from
- * @param {Object} opts     [opts={save:true}] options to pass to npm uninstall
+ * @param {String} target       Name of the package to be uninstalled
+ * @param {String} dest         Location from where to uninstall the package
+ * @param {Object} [opts={}]    Additional options
  *
- * @return {Promise|Error}    Returns a promise with the npm uninstall output or an error.
- *
+ * @return {Promise<string>}    Resolves when removal has finished
  */
 module.exports.uninstall = function (target, dest, opts) {
     var fetchArgs = ['uninstall'];
