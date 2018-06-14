@@ -23,19 +23,21 @@ var path = require('path');
 var fs = require('fs');
 var helpers = require('./helpers.js');
 
+var tmpDir;
+
+beforeEach(function () {
+    tmpDir = helpers.tmpDir();
+    process.chdir(tmpDir);
+});
+
+afterEach(function () {
+    process.chdir(__dirname); // Needed to rm the dir on Windows.
+    shell.rm('-rf', tmpDir);
+});
+
 describe('platform fetch/uninstall tests via npm & git', function () {
 
-    var tmpDir = helpers.tmpDir('plat_fetch');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fetch and uninstall a cordova platform via npm & git', function () {
 
@@ -79,18 +81,11 @@ describe('platform fetch/uninstall tests via npm & git', function () {
 
 describe('platform fetch/uninstall test via npm & git tags with --save', function () {
 
-    var tmpDir = helpers.tmpDir('plat_fetch_save');
     var opts = {'save': true};
 
     beforeEach(function () {
         // copy package.json from spec directory to tmpDir
-        shell.cp('spec/testpkg.json', path.join(tmpDir, 'package.json'));
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
+        shell.cp(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
     it('should fetch and uninstall a cordova platform via npm & git tags/branches', function () {
@@ -150,18 +145,11 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
 
 describe('plugin fetch/uninstall test with --save', function () {
 
-    var tmpDir = helpers.tmpDir('plug_fetch_save');
     var opts = {'save': true};
 
     beforeEach(function () {
         // copy package.json from spec directory to tmpDir
-        shell.cp('spec/testpkg.json', path.join(tmpDir, 'package.json'));
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
+        shell.cp(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
     it('should fetch and uninstall a cordova plugin via git commit sha', function () {
@@ -188,18 +176,10 @@ describe('plugin fetch/uninstall test with --save', function () {
 
 describe('test trimID method for npm and git', function () {
 
-    var tmpDir;
     var opts = {};
 
     beforeEach(function () {
-        tmpDir = helpers.tmpDir('plug_trimID');
-        shell.cp('-R', 'spec/support', path.join(tmpDir, 'support'));
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
+        shell.cp('-r', path.join(__dirname, 'support'), 'support');
     });
 
     it('should fetch the same cordova plugin twice in a row', function () {
@@ -292,17 +272,7 @@ describe('test trimID method for npm and git', function () {
 
 describe('fetch failure with unknown module', function () {
 
-    var tmpDir = helpers.tmpDir('fetch_fails_npm');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fail fetching a module that does not exist on npm', function () {
         return fetch('NOTAMODULE', tmpDir, opts)
@@ -318,17 +288,7 @@ describe('fetch failure with unknown module', function () {
 
 describe('fetch failure with git subdirectory', function () {
 
-    var tmpDir = helpers.tmpDir('fetch_fails_subdirectory');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fail fetching a giturl which contains a subdirectory', function () {
         return fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
@@ -344,17 +304,7 @@ describe('fetch failure with git subdirectory', function () {
 
 describe('scoped plugin fetch/uninstall tests via npm', function () {
 
-    var tmpDir = helpers.tmpDir('scoped_plug_fetch');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fetch a scoped plugin from npm', function () {
         return fetch('@stevegill/cordova-plugin-device', tmpDir, opts)
