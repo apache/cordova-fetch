@@ -18,7 +18,7 @@
  */
 
 var path = require('path');
-var fs = require('fs');
+var fs = require('fs-extra');
 var os = require('os');
 
 const tmpDirTemplate = path.join(os.tmpdir(), 'cordova-fetch-tests-');
