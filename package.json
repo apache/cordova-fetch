@@ -34,6 +34,7 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
+    "file-url": "^2.0.2",
     "jasmine": "^2.4.1",
     "rewire": "^4.0.1"
   },

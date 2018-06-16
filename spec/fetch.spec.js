@@ -22,6 +22,7 @@ var uninstall = fetch.uninstall;
 
 var path = require('path');
 var fs = require('fs-extra');
+var fileUrl = require('file-url');
 var helpers = require('./helpers.js');
 
 var tmpDir, opts;
@@ -69,12 +70,10 @@ describe('fetch/uninstall tests via npm & git', function () {
             .then(_ => uninstall('cordova-android', tmpDir, opts))
             .then(_ => expectNotToBeInstalled('cordova-android'))
 
-            .then(_ => fetchAndMatch('https://github.com/apache/cordova-ios.git', { name: 'cordova-ios' }))
-            .then(_ => uninstall('cordova-ios', tmpDir, opts))
-            .then(_ => expectNotToBeInstalled('cordova-ios'))
-
-            .then(_ => fetchAndMatch('https://github.com/apache/cordova-browser.git', { name: 'cordova-browser' }));
-    }, 120000);
+            .then(_ => fetchAndMatch('https://github.com/apache/cordova-browser.git', { name: 'cordova-browser' }))
+            .then(_ => uninstall('cordova-browser', tmpDir, opts))
+            .then(_ => expectNotToBeInstalled('cordova-browser'));
+    }, 60000);
 
     it('should fetch a scoped plugin from npm', function () {
         return fetchAndMatch('@stevegill/cordova-plugin-device');
@@ -143,18 +142,15 @@ describe('fetching already installed packages', function () {
     it('should return package path for registry packages', function () {
         return Promise.resolve()
             .then(_ => fetchAndMatch('cordova-plugin-device'))
-            .then(_ => fetchAndMatch('https://github.com/apache/cordova-plugin-media.git', { name: 'cordova-plugin-media' }))
-            .then(_ => fetchAndMatch('cordova-plugin-device'))
-            .then(_ => fetchAndMatch('github:apache/cordova-plugin-media', { name: 'cordova-plugin-media' }))
-            .then(_ => fetchAndMatch('https://github.com/apache/cordova-plugin-media', { name: 'cordova-plugin-media' }));
+            .then(_ => fetchAndMatch('cordova-plugin-device'));
     }, 40000);
 
     it('should return package path if git repo name differs from plugin id', function () {
-        const TARGET = 'https://github.com/AzureAD/azure-activedirectory-library-for-cordova.git';
+        const TARGET = 'git+' + fileUrl(path.resolve(__dirname, 'support/repo-name-neq-plugin-id.git'));
         return Promise.resolve()
-            .then(_ => fetchAndMatch(TARGET, { name: 'cordova-plugin-ms-adal' }))
-            .then(_ => fetchAndMatch(TARGET, { name: 'cordova-plugin-ms-adal' }));
-    }, 120000);
+            .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }))
+            .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }));
+    }, 40000);
 
     it('should return package path if using a relative path', function () {
         const TARGET = 'file:support/dummy-local-plugin';
@@ -164,11 +160,11 @@ describe('fetching already installed packages', function () {
     }, 60000);
 
     it('should return package path for git+http variants', function () {
-        const TARGET = 'git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git';
         return Promise.resolve()
-            .then(_ => fetchAndMatch(TARGET, { name: 'cordova-plugin-dialogs' }))
-            .then(_ => fetchAndMatch(TARGET, { name: 'cordova-plugin-dialogs' }));
-    }, 30000);
+            .then(_ => fetchAndMatch('github:apache/cordova-plugin-device', { name: 'cordova-plugin-device' }))
+            .then(_ => fetchAndMatch('https://github.com/apache/cordova-plugin-device', { name: 'cordova-plugin-device' }))
+            .then(_ => fetchAndMatch('git+https://github.com/apache/cordova-plugin-device', { name: 'cordova-plugin-device' }));
+    }, 60000);
 });
 
 describe('negative tests', function () {
