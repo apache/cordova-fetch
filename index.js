@@ -22,6 +22,9 @@ var events = require('cordova-common').events;
 var path = require('path');
 var fs = require('fs-extra');
 var CordovaError = require('cordova-common').CordovaError;
+const { getInstalledPath } = require('get-installed-path');
+const npa = require('npm-package-arg');
+const semver = require('semver');
 
 /*
  * A function that npm installs a module from npm or a git url
@@ -42,7 +45,10 @@ module.exports = function (target, dest, opts = {}) {
             // Create dest if it doesn't exist yet
             fs.ensureDirSync(dest);
         })
-        .then(_ => installPackage(target, dest, opts))
+        .then(_ => {
+            return pathToInstalledPackage(target, dest)
+                .catch(_ => installPackage(target, dest, opts));
+        })
         .catch(function (err) {
             throw new CordovaError(err);
         });
@@ -92,17 +98,18 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
     }
 }
 
+// Resolves to installation path of package defined by spec if the right version
+// is installed, rejects otherwise.
 function pathToInstalledPackage (spec, dest) {
-    // Strip version from spec
-    const parts = spec.split('@');
-    const isScoped = parts.length > 1 && parts[0] === '';
-    const pkgName = isScoped ? '@' + parts[1] : parts[0];
-
-    // append node_modules to nodeModulesDir if it doesn't come included
-    const nodeModulesDir = path.basename(dest) === 'node_modules' ?
-        dest : path.resolve(path.join(dest, 'node_modules'));
-
-    return path.resolve(nodeModulesDir, pkgName);
+    const { name, rawSpec } = npa(spec, dest);
+    return getInstalledPath(name, { local: true, cwd: dest })
+        .then(installPath => {
+            const { version } = fs.readJsonSync(path.join(installPath, 'package.json'));
+            if (!semver.satisfies(version, rawSpec)) {
+                throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
+            }
+            return installPath;
+        });
 }
 
 /*

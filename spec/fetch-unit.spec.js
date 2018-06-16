@@ -16,10 +16,41 @@
 */
 
 /* eslint-env jasmine */
+/* eslint-disable prefer-promise-reject-errors */
+
 const rewire = require('rewire');
-const fetch = rewire('..');
+
+describe('fetch', function () {
+    let fetch, installPackage;
+
+    beforeEach(function () {
+        fetch = rewire('..');
+        installPackage = jasmine.createSpy()
+            .and.returnValue(Promise.resolve('/foo'));
+        fetch.__set__({ fs: { ensureDirSync: _ => _ }, installPackage });
+    });
+
+    it('should return path to installed package', function () {
+        fetch.__set__({ pathToInstalledPackage: _ => Promise.resolve('/foo') });
+
+        return fetch('foo', 'bar').then(result => {
+            expect(result).toBe('/foo');
+            expect(installPackage).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should install package if not found', function () {
+        fetch.__set__({ pathToInstalledPackage: _ => Promise.reject() });
+
+        return fetch('foo', 'bar').then(result => {
+            expect(result).toBe('/foo');
+            expect(installPackage).toHaveBeenCalled();
+        });
+    });
+});
 
 describe('npmArgs', function () {
+    const fetch = rewire('..');
     const npmArgs = fetch.__get__('npmArgs');
 
     it('should handle missing options', function () {
