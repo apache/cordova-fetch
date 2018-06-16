@@ -34,72 +34,75 @@ var CordovaError = require('cordova-common').CordovaError;
  *
  */
 module.exports = function (target, dest, opts = {}) {
-    var fetchArgs = opts.link ? ['link'] : ['install'];
-    var nodeModulesDir = dest;
-
-    // check if npm is installed
-    return module.exports.isNpmInstalled()
+    return Q()
         .then(function () {
-            if (dest && target) {
-                // add target to fetchArgs Array
-                fetchArgs.push(target);
-
-                // append node_modules to nodeModulesDir if it doesn't come included
-                if (path.basename(dest) !== 'node_modules') {
-                    nodeModulesDir = path.resolve(path.join(dest, 'node_modules'));
-                }
-                // create node_modules if it doesn't exist
-                fs.ensureDirSync(nodeModulesDir);
-            } else throw new CordovaError('Need to supply a target and destination');
-
-            // set the directory where npm install will be run
-            opts.cwd = dest;
-
-            // npm should use production by default when install is npm run
-            if ((opts.production) || (opts.production === undefined)) {
-                fetchArgs.push('--production');
-                opts.production = true;
+            if (!dest || !target) {
+                throw new CordovaError('Need to supply a target and destination');
             }
-
-            // if user added --save flag, pass it to npm install command
-            if (opts.save_exact) {
-                events.emit('verbose', 'saving exact');
-                fetchArgs.push('--save-exact');
-            } else if (opts.save) {
-                events.emit('verbose', 'saving');
-                fetchArgs.push('--save');
-            } else {
-                fetchArgs.push('--no-save');
-            }
+            // Create dest if it doesn't exist yet
+            fs.ensureDirSync(dest);
         })
-        .then(function () {
-            // install new module
-            return superspawn.spawn('npm', fetchArgs, opts);
-        })
-        .then(extractPackageName)
-        .then(pkgName => path.resolve(nodeModulesDir, pkgName))
+        .then(_ => installPackage(target, dest, opts))
         .catch(function (err) {
             throw new CordovaError(err);
         });
 };
 
-function extractPackageName (npmInstallOutput) {
+// Installs the package specified by target and returns the installation path
+function installPackage (target, dest, opts) {
+    return isNpmInstalled()
+        .then(_ => npmArgs(target, opts))
+        .then(args => {
+            events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
+            return superspawn.spawn('npm', args, { cwd: dest });
+        })
+        .then(getTargetPackageSpecFromNpmInstallOutput)
+        .then(spec => pathToInstalledPackage(spec, dest));
+}
+
+function npmArgs (target, userOptions) {
+    const opts = Object.assign({ production: true }, userOptions);
+
+    const operation = opts.link ? 'link' : 'install';
+    const args = [operation, target];
+
+    if (opts.production) {
+        args.push('--production');
+    }
+    if (opts.save_exact) {
+        args.push('--save-exact');
+    } else if (opts.save) {
+        args.push('--save');
+    } else {
+        args.push('--no-save');
+    }
+    return args;
+}
+
+function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
     const lines = npmInstallOutput.split('\n');
-    let spec;
     if (lines[0].startsWith('+ ')) {
         // npm >= 5
-        spec = lines[0].slice(2);
+        return lines[0].slice(2);
     } else if (lines[1].startsWith('└─') || lines[1].startsWith('`-')) {
         // 3 <= npm <= 4
-        spec = lines[1].slice(4);
+        return lines[1].slice(4).split(' ')[0];
     } else {
         throw new CordovaError('Could not determine package name from output:\n' + npmInstallOutput);
     }
+}
 
+function pathToInstalledPackage (spec, dest) {
     // Strip version from spec
     const parts = spec.split('@');
     const isScoped = parts.length > 1 && parts[0] === '';
-    return isScoped ? '@' + parts[1] : parts[0];
+    const pkgName = isScoped ? '@' + parts[1] : parts[0];
+
+    // append node_modules to nodeModulesDir if it doesn't come included
+    const nodeModulesDir = path.basename(dest) === 'node_modules' ?
+        dest : path.resolve(path.join(dest, 'node_modules'));
+
+    return path.resolve(nodeModulesDir, pkgName);
 }
 
 /*
