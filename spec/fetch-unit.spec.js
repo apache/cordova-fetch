@@ -17,17 +17,14 @@
 
 /* eslint-env jasmine */
 var fetch = require('../index.js');
-var shell = require('shelljs');
-var fs = require('fs');
+var fs = require('fs-extra');
 var superspawn = require('cordova-common').superspawn;
 
 describe('unit tests for index.js', function () {
     beforeEach(function () {
         spyOn(superspawn, 'spawn').and.returnValue('+ foo@1.2.3');
-        spyOn(shell, 'mkdir').and.returnValue(true);
-        spyOn(shell, 'which').and.returnValue(Promise.resolve());
         spyOn(fetch, 'isNpmInstalled').and.returnValue(Promise.resolve());
-        spyOn(fs, 'existsSync').and.returnValue(false);
+        spyOn(fs, 'ensureDirSync').and.returnValue(false);
     });
 
     it('should handle missing options', function () {

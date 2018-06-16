@@ -16,11 +16,11 @@
  */
 
 var Q = require('q');
-var shell = require('shelljs');
+var which = Q.denodeify(require('which'));
 var superspawn = require('cordova-common').superspawn;
 var events = require('cordova-common').events;
 var path = require('path');
-var fs = require('fs');
+var fs = require('fs-extra');
 var CordovaError = require('cordova-common').CordovaError;
 
 /*
@@ -49,9 +49,7 @@ module.exports = function (target, dest, opts = {}) {
                     nodeModulesDir = path.resolve(path.join(dest, 'node_modules'));
                 }
                 // create node_modules if it doesn't exist
-                if (!fs.existsSync(nodeModulesDir)) {
-                    shell.mkdir('-p', nodeModulesDir);
-                }
+                fs.ensureDirSync(nodeModulesDir);
             } else throw new CordovaError('Need to supply a target and destination');
 
             // set the directory where npm install will be run
@@ -110,11 +108,8 @@ function extractPackageName (npmInstallOutput) {
  */
 
 function isNpmInstalled () {
-    return Q.Promise(function (resolve) {
-        if (!shell.which('npm')) {
-            throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
-        }
-        resolve();
+    return which('npm').catch(_ => {
+        throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
     });
 }
 
@@ -154,13 +149,6 @@ module.exports.uninstall = function (target, dest, opts) {
             // run npm uninstall, this will remove dependency
             // from package.json if --save was used.
             return superspawn.spawn('npm', fetchArgs, opts);
-        })
-        .then(function (res) {
-            var pluginDest = path.join(dest, 'node_modules', target);
-            if (fs.existsSync(pluginDest)) {
-                shell.rm('-rf', pluginDest);
-            }
-            return res;
         })
         .catch(function (err) {
             throw new CordovaError(err);

@@ -18,30 +18,31 @@
 /* eslint-env jasmine */
 var fetch = require('../index.js');
 var uninstall = require('../index.js').uninstall;
-var shell = require('shelljs');
 var path = require('path');
-var fs = require('fs');
+var fs = require('fs-extra');
 var helpers = require('./helpers.js');
+
+var tmpDir;
+
+beforeEach(function () {
+    tmpDir = helpers.tmpDir();
+    process.chdir(tmpDir);
+});
+
+afterEach(function () {
+    process.chdir(__dirname); // Needed to rm the dir on Windows.
+    fs.removeSync(tmpDir);
+});
 
 describe('platform fetch/uninstall tests via npm & git', function () {
 
-    var tmpDir = helpers.tmpDir('plat_fetch');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fetch and uninstall a cordova platform via npm & git', function () {
 
         return fetch('cordova-android', tmpDir, opts)
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-android');
@@ -54,7 +55,7 @@ describe('platform fetch/uninstall tests via npm & git', function () {
                 return fetch('https://github.com/apache/cordova-ios.git', tmpDir, opts);
             })
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-ios');
@@ -69,7 +70,7 @@ describe('platform fetch/uninstall tests via npm & git', function () {
                 return fetch('https://github.com/apache/cordova-browser.git', tmpDir, opts);
             })
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-browser');
@@ -79,68 +80,61 @@ describe('platform fetch/uninstall tests via npm & git', function () {
 
 describe('platform fetch/uninstall test via npm & git tags with --save', function () {
 
-    var tmpDir = helpers.tmpDir('plat_fetch_save');
     var opts = {'save': true};
 
     beforeEach(function () {
         // copy package.json from spec directory to tmpDir
-        shell.cp('spec/testpkg.json', path.join(tmpDir, 'package.json'));
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
+        fs.copySync(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
     it('should fetch and uninstall a cordova platform via npm & git tags/branches', function () {
         return fetch('cordova-android@5.1.1', tmpDir, opts)
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-android');
                 expect(pkgJSON.version).toBe('5.1.1');
 
-                var rootPJ = require(path.join(tmpDir, 'package.json'));
+                var rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
                 expect(rootPJ.dependencies['cordova-android']).toBe('^5.1.1');
 
                 return uninstall('cordova-android', tmpDir, opts);
             })
             .then(function () {
-                var rootPJ = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf8'));
+                var rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
                 expect(Object.keys(rootPJ.dependencies).length).toBe(0);
                 expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-android'))).toBe(false);
 
                 return fetch('https://github.com/apache/cordova-ios.git#rel/4.1.1', tmpDir, opts);
             })
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-ios');
                 expect(pkgJSON.version).toBe('4.1.1');
 
-                var rootPJ = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf8'));
+                var rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
                 expect(rootPJ.dependencies['cordova-ios']).toBe('git+https://github.com/apache/cordova-ios.git#rel/4.1.1');
 
                 return uninstall('cordova-ios', tmpDir, opts);
             })
             .then(function () {
-                var rootPJ = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf8'));
+                var rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
                 expect(Object.keys(rootPJ.dependencies).length).toBe(0);
                 expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-ios'))).toBe(false);
 
                 return fetch('https://github.com/apache/cordova-android.git#4.1.x', tmpDir, opts);
             })
             .then(function (result) {
-                var pkgJSON = JSON.parse(fs.readFileSync(path.join(result, 'package.json'), 'utf8'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-android');
                 expect(pkgJSON.version).toBe('4.1.1');
 
-                var rootPJ = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf8'));
+                var rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
                 expect(rootPJ.dependencies['cordova-android']).toBe('git+https://github.com/apache/cordova-android.git#4.1.x');
 
                 return uninstall('cordova-android', tmpDir, opts);
@@ -150,36 +144,29 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
 
 describe('plugin fetch/uninstall test with --save', function () {
 
-    var tmpDir = helpers.tmpDir('plug_fetch_save');
     var opts = {'save': true};
 
     beforeEach(function () {
         // copy package.json from spec directory to tmpDir
-        shell.cp('spec/testpkg.json', path.join(tmpDir, 'package.json'));
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
+        fs.copySync(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
     it('should fetch and uninstall a cordova plugin via git commit sha', function () {
         return fetch('https://github.com/apache/cordova-plugin-contacts.git#7db612115755c2be73a98dda76ff4c5fd9d8a575', tmpDir, opts)
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-plugin-contacts');
                 expect(pkgJSON.version).toBe('2.0.2-dev');
 
-                var rootPJ = require(path.join(tmpDir, 'package.json'));
+                var rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
                 expect(rootPJ.dependencies['cordova-plugin-contacts']).toBe('git+https://github.com/apache/cordova-plugin-contacts.git#7db612115755c2be73a98dda76ff4c5fd9d8a575');
 
                 return uninstall('cordova-plugin-contacts', tmpDir, opts);
             })
             .then(function () {
-                var rootPJ = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf8'));
+                var rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
                 expect(Object.keys(rootPJ.dependencies).length).toBe(0);
                 expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-plugin-contacts'))).toBe(false);
             });
@@ -188,24 +175,16 @@ describe('plugin fetch/uninstall test with --save', function () {
 
 describe('test trimID method for npm and git', function () {
 
-    var tmpDir;
     var opts = {};
 
     beforeEach(function () {
-        tmpDir = helpers.tmpDir('plug_trimID');
-        shell.cp('-R', 'spec/support', path.join(tmpDir, 'support'));
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
+        fs.copySync(path.join(__dirname, 'support'), 'support');
     });
 
     it('should fetch the same cordova plugin twice in a row', function () {
         return fetch('cordova-plugin-device', tmpDir, opts)
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-plugin-device');
@@ -213,7 +192,7 @@ describe('test trimID method for npm and git', function () {
                 return fetch('https://github.com/apache/cordova-plugin-media.git', tmpDir, opts);
             })
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-plugin-media');
@@ -282,7 +261,7 @@ describe('test trimID method for npm and git', function () {
                 return fetch('git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git', tmpDir, opts);
             })
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('cordova-plugin-dialogs');
@@ -292,17 +271,7 @@ describe('test trimID method for npm and git', function () {
 
 describe('fetch failure with unknown module', function () {
 
-    var tmpDir = helpers.tmpDir('fetch_fails_npm');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fail fetching a module that does not exist on npm', function () {
         return fetch('NOTAMODULE', tmpDir, opts)
@@ -317,17 +286,7 @@ describe('fetch failure with unknown module', function () {
 
 describe('fetch failure with git subdirectory', function () {
 
-    var tmpDir = helpers.tmpDir('fetch_fails_subdirectory');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fail fetching a giturl which contains a subdirectory', function () {
         return fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
@@ -342,22 +301,12 @@ describe('fetch failure with git subdirectory', function () {
 
 describe('scoped plugin fetch/uninstall tests via npm', function () {
 
-    var tmpDir = helpers.tmpDir('scoped_plug_fetch');
     var opts = {};
-
-    beforeEach(function () {
-        process.chdir(tmpDir);
-    });
-
-    afterEach(function () {
-        process.chdir(path.join(__dirname, '..')); // Needed to rm the dir on Windows.
-        shell.rm('-rf', tmpDir);
-    });
 
     it('should fetch a scoped plugin from npm', function () {
         return fetch('@stevegill/cordova-plugin-device', tmpDir, opts)
             .then(function (result) {
-                var pkgJSON = require(path.join(result, 'package.json'));
+                var pkgJSON = fs.readJsonSync(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
                 expect(pkgJSON.name).toBe('@stevegill/cordova-plugin-device');
