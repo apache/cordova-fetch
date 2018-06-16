@@ -16,50 +16,64 @@
 */
 
 /* eslint-env jasmine */
-var fetch = require('../index.js');
-var fs = require('fs-extra');
-var superspawn = require('cordova-common').superspawn;
+/* eslint-disable prefer-promise-reject-errors */
 
-describe('unit tests for index.js', function () {
+const rewire = require('rewire');
+
+describe('fetch', function () {
+    let fetch, installPackage;
+
     beforeEach(function () {
-        spyOn(superspawn, 'spawn').and.returnValue('+ foo@1.2.3');
-        spyOn(fetch, 'isNpmInstalled').and.returnValue(Promise.resolve());
-        spyOn(fs, 'ensureDirSync').and.returnValue(false);
+        fetch = rewire('..');
+        installPackage = jasmine.createSpy()
+            .and.returnValue(Promise.resolve('/foo'));
+        fetch.__set__({ fs: { ensureDirSync: _ => _ }, installPackage });
     });
 
+    it('should return path to installed package', function () {
+        fetch.__set__({ pathToInstalledPackage: _ => Promise.resolve('/foo') });
+
+        return fetch('foo', 'bar').then(result => {
+            expect(result).toBe('/foo');
+            expect(installPackage).not.toHaveBeenCalled();
+        });
+    });
+
+    it('should install package if not found', function () {
+        fetch.__set__({ pathToInstalledPackage: _ => Promise.reject() });
+
+        return fetch('foo', 'bar').then(result => {
+            expect(result).toBe('/foo');
+            expect(installPackage).toHaveBeenCalled();
+        });
+    });
+});
+
+describe('npmArgs', function () {
+    const fetch = rewire('..');
+    const npmArgs = fetch.__get__('npmArgs');
+
     it('should handle missing options', function () {
-        return fetch('platform', 'tmpDir');
+        npmArgs('platform');
     });
 
     it('npm install should be called with production flag (default)', function () {
         var opts = { cwd: 'some/path', production: true, save: true };
-        return fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
-            });
+        expect(npmArgs('platform', opts)).toContain('--production');
     });
 
     it('save-exact should be true if passed in', function () {
         var opts = { cwd: 'some/path', save_exact: true };
-        return fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/save-exact/), jasmine.any(Object));
-            });
+        expect(npmArgs('platform', opts)).toContain('--save-exact');
     });
 
     it('noprod should turn production off', function () {
         var opts = { cwd: 'some/path', production: false };
-        return fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).not.toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
-            });
+        expect(npmArgs('platform', opts)).not.toContain('--production');
     });
 
     it('when save is false, no-save flag should be passed through', function () {
         var opts = { cwd: 'some/path', production: true, save: false };
-        return fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/--no-save/), jasmine.any(Object));
-            });
+        expect(npmArgs('platform', opts)).toContain('--no-save');
     });
 });
