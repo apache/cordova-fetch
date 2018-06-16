@@ -62,7 +62,7 @@ function expectDependenciesToBe (deps) {
     expect(rootPJ.dependencies).toEqual(deps);
 }
 
-describe('platform fetch/uninstall tests via npm & git', function () {
+describe('fetch/uninstall tests via npm & git', function () {
 
     it('should fetch and uninstall a cordova platform via npm & git', function () {
         return Promise.resolve()
@@ -76,9 +76,13 @@ describe('platform fetch/uninstall tests via npm & git', function () {
 
             .then(_ => fetchAndMatch('https://github.com/apache/cordova-browser.git', { name: 'cordova-browser' }));
     }, 120000);
+
+    it('should fetch a scoped plugin from npm', function () {
+        return fetchAndMatch('@stevegill/cordova-plugin-device');
+    }, 30000);
 });
 
-describe('platform fetch/uninstall test via npm & git tags with --save', function () {
+describe('fetch/uninstall with --save', function () {
 
     beforeEach(function () {
         opts = {save: true};
@@ -116,15 +120,6 @@ describe('platform fetch/uninstall test via npm & git tags with --save', functio
             .then(_ => expectDependenciesToBe({'cordova-android': 'git+https://github.com/apache/cordova-android.git#4.1.x'}))
             .then(_ => uninstall('cordova-android', tmpDir, opts));
     }, 150000);
-});
-
-describe('plugin fetch/uninstall test with --save', function () {
-
-    beforeEach(function () {
-        opts = {save: true};
-        // copy package.json from spec directory to tmpDir
-        fs.copySync(path.join(__dirname, 'testpkg.json'), 'package.json');
-    });
 
     it('should fetch and uninstall a cordova plugin via git commit sha', function () {
         const URL = 'https://github.com/apache/cordova-plugin-contacts.git#7db612115755c2be73a98dda76ff4c5fd9d8a575';
@@ -140,13 +135,13 @@ describe('plugin fetch/uninstall test with --save', function () {
     }, 30000);
 });
 
-describe('test trimID method for npm and git', function () {
+describe('fetching already installed packages', function () {
 
     beforeEach(function () {
         fs.copySync(path.join(__dirname, 'support'), 'support');
     });
 
-    it('should fetch the same cordova plugin twice in a row', function () {
+    it('should return package path for registry packages', function () {
         return Promise.resolve()
             .then(_ => fetchAndMatch('cordova-plugin-device'))
             .then(_ => fetchAndMatch('https://github.com/apache/cordova-plugin-media.git', { name: 'cordova-plugin-media' }))
@@ -155,21 +150,21 @@ describe('test trimID method for npm and git', function () {
             .then(_ => fetchAndMatch('https://github.com/apache/cordova-plugin-media', { name: 'cordova-plugin-media' }));
     }, 40000);
 
-    it('should fetch same plugin twice in a row if git repo name differ from plugin id', function () {
+    it('should return package path if git repo name differs from plugin id', function () {
         const TARGET = 'https://github.com/AzureAD/azure-activedirectory-library-for-cordova.git';
         return Promise.resolve()
             .then(_ => fetchAndMatch(TARGET, { name: 'cordova-plugin-ms-adal' }))
             .then(_ => fetchAndMatch(TARGET, { name: 'cordova-plugin-ms-adal' }));
     }, 120000);
 
-    it('should fetch same plugin twice in a row if using a relative path', function () {
+    it('should return package path if using a relative path', function () {
         const TARGET = 'file:support/dummy-local-plugin';
         return Promise.resolve()
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }))
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }));
     }, 60000);
 
-    it('should fetch from git+http successfully', function () {
+    it('should return package path for git+http variants', function () {
         const TARGET = 'git+http://gitbox.apache.org/repos/asf/cordova-plugin-dialogs.git';
         return Promise.resolve()
             .then(_ => fetchAndMatch(TARGET, { name: 'cordova-plugin-dialogs' }))
@@ -177,7 +172,7 @@ describe('test trimID method for npm and git', function () {
     }, 30000);
 });
 
-describe('fetch failure with unknown module', function () {
+describe('negative tests', function () {
 
     it('should fail fetching a module that does not exist on npm', function () {
         return fetch('NOTAMODULE', tmpDir, opts)
@@ -188,9 +183,6 @@ describe('fetch failure with unknown module', function () {
                 expect(err).toBeDefined();
             });
     }, 30000);
-});
-
-describe('fetch failure with git subdirectory', function () {
 
     it('should fail fetching a giturl which contains a subdirectory', function () {
         return fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
@@ -200,12 +192,5 @@ describe('fetch failure with git subdirectory', function () {
                 expect(err.message.code).toBe(1);
                 expect(err).toBeDefined();
             });
-    }, 30000);
-});
-
-describe('scoped plugin fetch/uninstall tests via npm', function () {
-
-    it('should fetch a scoped plugin from npm', function () {
-        return fetchAndMatch('@stevegill/cordova-plugin-device');
     }, 30000);
 });
