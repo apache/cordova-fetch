@@ -69,8 +69,7 @@ function installPackage (target, dest, opts) {
 function npmArgs (target, userOptions) {
     const opts = Object.assign({ production: true }, userOptions);
 
-    const operation = opts.link ? 'link' : 'install';
-    const args = [operation, target];
+    const args = ['install', target];
 
     if (opts.production) {
         args.push('--production');
