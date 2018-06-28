@@ -25,30 +25,58 @@
 
 # cordova-fetch
 
-This module is used for fetching modules from npm and gitURLs. It fetches the modules via `npm install`. It can also `npm uninstall` modules from a project.
+This package can be used to install and uninstall Node.js packages using npm.
 
-## Usage:
+## Usage
 
-### Fetching:
-```
-var fetch = require('cordova-fetch');
+### fetch
 
-fetch(spec, dest, opts);
-```
+Installs a module from npm, a git url or the local file system. Returns a `Promise` resolving to the absolute path to the installed package.
 
-`spec` can be a string containg a npm `packageID` or a `git URL`. 
-`dest` is string of the directory location you wish to `npm install` these modules.
-`opts` is an Object of options cordova fetch handles. Currently, fetch only support the `save` option.
-    eg. `{'save':true}`
+```js
+const fetch = require('cordova-fetch');
 
-### Removing:
-```
-var npmUninstall = require('cordova-fetch').uninstall;
-
-npmUninstall(spec, dest, opts);
+fetch(spec, dest, opts).then(pathToInstalledPackage => {
+    // Do something
+});
 ```
 
-`spec` can be a string containg a npm `packageID`. 
-`dest` is string of the directory location you wish to `npm uninstall` these modules.
-`opts` is an Object of options cordova fetch handles. Currently, fetch only support the `save` option.
-    eg. `{'save':true}`
+#### Parameters
+
+Parameter | Description
+-|-
+`spec` | A spec for the package to be installed (anything supported by `npm install`)
+`dest` | Location where to install the package
+`opts` | Additional options (optional)
+
+##### Options
+
+Option | Default | Description
+-|-
+`save` | `false` | Adds the package as  dependency to `package.json` iff `true`
+
+### uninstall
+
+Uninstalls a package from given directory. Returns a `Promise` that resolves when removal has finished
+
+```js
+const { uninstall } = require('cordova-fetch');
+
+uninstall(packageName, dest, opts).then(() => {
+    // Do something
+});
+```
+
+#### Parameters
+
+Parameter | Description
+-|-
+`packageName` | Name of the package to be uninstalled
+`dest` | Location from where to uninstall the package
+`opts` | An Object with additional options
+
+##### Options
+
+Option | Default | Description
+-|-
+`save` | `false` | Removes dependency from `package.json` iff `true`
