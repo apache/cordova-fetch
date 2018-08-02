@@ -21,7 +21,7 @@
     "email": "dev@cordova.apache.org"
   },
   "dependencies": {
-    "cordova-common": "^2.2.0",
+    "cordova-common": "^2.2.5",
     "dependency-ls": "^1.1.0",
     "hosted-git-info": "^2.5.0",
     "is-url": "^1.2.1",
