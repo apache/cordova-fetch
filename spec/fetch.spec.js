@@ -39,49 +39,40 @@ describe('platform fetch/uninstall tests via npm & git', function () {
 
     it('should fetch and uninstall a cordova platform via npm & git', function (done) {
 
-        // cordova-wp8 which is now deprecated should never
-        // drop support for deprecated Node.js 4 version.
-        fetch('cordova-wp8', tmpDir, opts)
+        fetch('cordova-android', tmpDir, opts)
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
-                expect(pkgJSON.name).toBe('cordova-wp8');
+                expect(pkgJSON.name).toBe('cordova-android');
 
-                return uninstall('cordova-wp8', tmpDir, opts);
+                return uninstall('cordova-android', tmpDir, opts);
             })
             .then(function () {
-                expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-wp8'))).toBe(false);
+                expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-android'))).toBe(false);
 
-                // https://github.com/apache/cordova-blackberry.git which is now deprecated
-                // should never drop suport for deprecated Node.js 4 version.
-                return fetch('https://github.com/apache/cordova-ubuntu.git', tmpDir, opts);
+                return fetch('https://github.com/apache/cordova-ios.git', tmpDir, opts);
             })
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
-                expect(pkgJSON.name).toBe('cordova-ubuntu');
+                expect(pkgJSON.name).toBe('cordova-ios');
 
-                return uninstall('cordova-ubuntu', tmpDir, opts);
+                return uninstall('cordova-ios', tmpDir, opts);
             })
             .then(function () {
-                expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-blackberry'))).toBe(false);
-                expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-blackberry10'))).toBe(false);
+                expect(fs.existsSync(path.join(tmpDir, 'node_modules', 'cordova-ios'))).toBe(false);
 
-                // FUTURE TBD:
                 // return fetch('git+ssh://git@github.com/apache/cordova-browser.git#487d91d1ded96b8e2029f2ee90f12a8b20499f54', tmpDir, opts);
                 // can't test ssh right now as it is requiring ssh password
-
-                // https://github.com/apache/cordova-blackberry.git which is now deprecated
-                // drop support for deprecated Node.js 4 version.
-                return fetch('https://github.com/apache/cordova-blackberry.git', tmpDir, opts);
+                return fetch('https://github.com/apache/cordova-browser.git', tmpDir, opts);
             })
             .then(function (result) {
                 var pkgJSON = require(path.join(result, 'package.json'));
                 expect(result).toBeDefined();
                 expect(fs.existsSync(result)).toBe(true);
-                expect(pkgJSON.name).toBe('cordova-blackberry10');
+                expect(pkgJSON.name).toBe('cordova-browser');
             })
             .fail(function (err) {
                 console.error(err);
