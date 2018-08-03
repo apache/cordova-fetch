@@ -79,7 +79,7 @@ describe('platform fetch/uninstall tests via npm & git', function () {
                 expect(err).toBeUndefined();
             })
             .fin(done);
-    }, 600000);
+    }, 60000);
 });
 
 describe('platform fetch/uninstall test via npm & git tags with --save', function () {
@@ -198,7 +198,7 @@ describe('plugin fetch/uninstall test with --save', function () {
                 expect(err).toBeUndefined();
             })
             .fin(done);
-    }, 300000);
+    }, 30000);
 });
 
 describe('test trimID method for npm and git', function () {
@@ -262,7 +262,7 @@ describe('test trimID method for npm and git', function () {
                 expect(err).toBeUndefined();
             })
             .fin(done);
-    }, 400000);
+    }, 40000);
 
     it('should fetch same plugin twice in a row if git repo name differ from plugin id', function (done) {
         fetch('https://github.com/AzureAD/azure-activedirectory-library-for-cordova.git', tmpDir, opts)
@@ -282,7 +282,7 @@ describe('test trimID method for npm and git', function () {
                 expect(err).toBeUndefined();
             })
             .fin(done);
-    }, 300000);
+    }, 30000);
 });
 
 describe('fetch failure with unknown module', function () {
@@ -309,7 +309,7 @@ describe('fetch failure with unknown module', function () {
                 expect(err).toBeDefined();
             })
             .fin(done);
-    }, 300000);
+    }, 30000);
 });
 
 describe('fetch failure with git subdirectory', function () {
@@ -336,7 +336,7 @@ describe('fetch failure with git subdirectory', function () {
                 expect(err).toBeDefined();
             })
             .fin(done);
-    }, 300000);
+    }, 30000);
 });
 
 describe('scoped plugin fetch/uninstall tests via npm', function () {
@@ -366,5 +366,5 @@ describe('scoped plugin fetch/uninstall tests via npm', function () {
                 expect(err).toBeUndefined();
             })
             .fin(done);
-    }, 300000);
+    }, 30000);
 });
