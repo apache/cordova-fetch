@@ -36,7 +36,6 @@
     "eslint-plugin-node": "^5.2.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
-    "fs-extra": "^6.0.1",
     "jasmine": "^2.4.1"
   },
   "scripts": {
