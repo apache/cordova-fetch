@@ -20,6 +20,10 @@
 -->
 # Cordova-fetch Release Notes
 
+### 1.3.1 (Aug 2, 2018)
+* [CB-14251](https://issues.apache.org/jira/browse/CB-14251) in-range cordova-common@^2.2.5 update (1.3.x only)
+* [GH-20](https://github.com/apache/cordova-fetch/pull/20) Fix repo url in package.json
+
 ### 1.3.0 (Dec 14, 2017)
 * [CB-13055](https://issues.apache.org/jira/browse/CB-13055): added workaround for when `jsonDiff` has more than one different key. 
 * Support git shortlink package references
