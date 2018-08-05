@@ -16,6 +16,9 @@
 */
 
 /* eslint-env jasmine */
+
+'use strict';
+
 const rewire = require('rewire');
 const fetch = rewire('..');
 
