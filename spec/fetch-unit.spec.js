@@ -16,71 +16,36 @@
 */
 
 /* eslint-env jasmine */
-var fetch = require('../index.js');
-var shell = require('shelljs');
-var fs = require('fs');
-var Q = require('q');
-var superspawn = require('cordova-common').superspawn;
 
-describe('unit tests for index.js', function () {
-    beforeEach(function () {
-        spyOn(superspawn, 'spawn').and.returnValue(true);
-        spyOn(shell, 'mkdir').and.returnValue(true);
-        spyOn(shell, 'which').and.returnValue(Q());
-        spyOn(fetch, 'isNpmInstalled').and.returnValue(Q());
-        spyOn(fetch, 'getPath').and.returnValue('some/path');
-        spyOn(fs, 'existsSync').and.returnValue(false);
+'use strict';
+
+const rewire = require('rewire');
+const fetch = rewire('..');
+
+describe('npmArgs', function () {
+    const npmArgs = fetch.__get__('npmArgs');
+
+    it('should handle missing options', function () {
+        npmArgs('platform');
     });
 
-    it('npm install should be called with production flag (default)', function (done) {
-        var opts = { cwd: 'some/path', production: true, save: true};
-        fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+    it('npm install should be called with production flag (default)', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        expect(npmArgs('platform', opts)).toContain('--production');
     });
 
-    it('save-exact should be true if passed in', function (done) {
+    it('save-exact should be true if passed in', function () {
         var opts = { cwd: 'some/path', save_exact: true };
-        fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/save-exact/), jasmine.any(Object));
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+        expect(npmArgs('platform', opts)).toContain('--save-exact');
     });
 
-    it('noprod should turn production off', function (done) {
-        var opts = { cwd: 'some/path', production: false};
-        fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).not.toHaveBeenCalledWith('npm', jasmine.stringMatching(/production/), jasmine.any(Object));
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+    it('noprod should turn production off', function () {
+        var opts = { cwd: 'some/path', production: false };
+        expect(npmArgs('platform', opts)).not.toContain('--production');
     });
 
-    it('when save is false, no-save flag should be passed through', function (done) {
-        var opts = { cwd: 'some/path', production: true, save: false};
-        fetch('platform', 'tmpDir', opts)
-            .then(function (result) {
-                expect(superspawn.spawn).toHaveBeenCalledWith('npm', jasmine.stringMatching(/--no-save/), jasmine.any(Object));
-            })
-            .fail(function (err) {
-                console.error(err);
-                expect(err).toBeUndefined();
-            })
-            .fin(done);
+    it('when save is false, no-save flag should be passed through', function () {
+        var opts = { cwd: 'some/path', production: true, save: false };
+        expect(npmArgs('platform', opts)).toContain('--no-save');
     });
 });
