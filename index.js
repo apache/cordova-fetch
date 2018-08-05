@@ -33,7 +33,8 @@ var CordovaError = require('cordova-common').CordovaError;
  * @return {String|Promise}    Returns string of the absolute path to the installed module.
  *
  */
-module.exports = function (target, dest, opts = {}) {
+module.exports = function (target, dest, opts) {
+    opts = {};
     var fetchArgs = opts.link ? ['link'] : ['install'];
     var nodeModulesDir = dest;
 
