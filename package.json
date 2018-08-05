@@ -44,7 +44,7 @@
     "jasmine": "jasmine spec/fetch.spec.js spec/fetch-unit.spec.js"
   },
   "engines": {
-    "node": ">= 6",
-    "npm": ">= 3"
+    "node": ">=4.0.0",
+    "npm": ">= 2.5.1"
   }
 }
