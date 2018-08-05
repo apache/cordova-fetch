@@ -38,9 +38,10 @@ afterEach(function () {
     fs.removeSync(tmpDir);
 });
 
-function fetchAndMatch (target, pkgProps = { name: target }) {
+function fetchAndMatch (target, pkgProps) {
+    const p = pkgProps || { name: target };
     return fetch(target, tmpDir, opts)
-        .then(expectPackageToMatch(pkgProps));
+        .then(expectPackageToMatch(p));
 }
 
 function expectPackageToMatch (pkgProps) {
