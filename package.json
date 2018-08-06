@@ -43,7 +43,7 @@
   },
   "scripts": {
     "test": "npm run eslint && npm run jasmine",
-    "eslint": "eslint .",
+    "eslint": "eslint *.js spec",
     "jasmine": "jasmine spec/fetch.spec.js spec/fetch-unit.spec.js"
   },
   "engines": {
