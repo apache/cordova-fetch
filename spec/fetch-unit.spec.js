@@ -84,3 +84,124 @@ describe('unit tests for index.js', function () {
             .fin(done);
     });
 });
+
+describe('more unit tests for index.js: internal getPath() call', function () {
+    beforeEach(function () {
+        spyOn(superspawn, 'spawn').and.returnValue(Promise.resolve('+ my-repo@2.0.0'));
+        spyOn(shell, 'mkdir').and.returnValue(true);
+        spyOn(shell, 'which').and.returnValue(Q());
+        spyOn(fetch, 'isNpmInstalled').and.returnValue(Q());
+        spyOn(fetch, 'getPath').and.returnValue('some/path/to/my-repo');
+        spyOn(fs, 'existsSync').and.returnValue(false);
+    });
+
+    it('internal getPath to be called with correct arguments for: https://scm.service.io/user/my-repo', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'https://scm.service.io/user/my-repo';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: git://scm.service.io/user/my-repo', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'git://scm.service.io/user/my-repo';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: https://scm.service.io/user/my-repo#old-tag', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'https://scm.service.io/user/my-repo#old-tag';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: git://scm.service.io/user/my-repo#old-tag', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'git://scm.service.io/user/my-repo#old-tag';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: https://scm.service.io/user/my-repo.git', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'https://scm.service.io/user/my-repo.git';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: git://scm.service.io/user/my-repo.git', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'git://scm.service.io/user/my-repo.git';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: https://scm.service.io/user/my-repo.git#old-tag', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'https://scm.service.io/user/my-repo.git#old-tag';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: git://scm.service.io/user/my-repo.git#old-tag', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'git://scm.service.io/user/my-repo.git#old-tag';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: https://scm.git.service.io/user/my-repo.git', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'https://scm.git.service.io/user/my-repo.git';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: git://scm.git.service.io/user/my-repo.git', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'git://scm.git.service.io/user/my-repo.git';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+
+    it('internal getPath to be called with correct arguments for: https://scm.service.io/user/my-repo-other-url', function () {
+        var opts = { cwd: 'some/path', production: true, save: true };
+        var url = 'https://scm.service.io/user/my-repo-other-url';
+        return fetch(url, 'tmpDir', opts)
+            .then(function (result) {
+                expect(fetch.getPath).toHaveBeenCalledWith('my-repo', jasmine.stringMatching(/node_modules$/), url);
+                expect(result).toBe('some/path/to/my-repo');
+            });
+    });
+});
