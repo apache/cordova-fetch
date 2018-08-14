@@ -18,18 +18,10 @@
  */
 
 var path = require('path');
-var fs = require('fs');
-var shell = require('shelljs');
+var fs = require('fs-extra');
 var os = require('os');
 
-module.exports.tmpDir = function (subdir) {
-    var dir = path.join(os.tmpdir(), 'e2e-test');
-    if (subdir) {
-        dir = path.join(dir, subdir);
-    }
-    if (fs.existsSync(dir)) {
-        shell.rm('-rf', dir);
-    }
-    shell.mkdir('-p', dir);
-    return dir;
+const tmpDirTemplate = path.join(os.tmpdir(), 'cordova-fetch-tests-');
+module.exports.tmpDir = function () {
+    return fs.mkdtempSync(tmpDirTemplate);
 };
