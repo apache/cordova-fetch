@@ -50,7 +50,7 @@ Parameter | Description
 ##### Options
 
 Option | Default | Description
--|-
+-|-|-
 `save` | `false` | Adds the package as dependency to `package.json` iff `true`
 
 ### `uninstall`
@@ -76,7 +76,7 @@ Parameter | Description
 ##### Options
 
 Option | Default | Description
--|-
+-|-|-
 `save` | `false` | Removes dependency from `package.json` iff `true`
 
 
