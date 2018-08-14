@@ -19,11 +19,9 @@
 #
 -->
 
-[![Build status](https://ci.appveyor.com/api/projects/status/6xv212nihtcnbsov?svg=true)](https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-fetch/branch/master)
-[![Build Status](https://travis-ci.org/apache/cordova-fetch.svg?branch=master)](https://travis-ci.org/apache/cordova-fetch)
 [![NPM](https://nodei.co/npm/cordova-fetch.png)](https://nodei.co/npm/cordova-fetch/)
 
-# cordova-fetch
+# cordova-fetch [![Travis Badge]][Travis] [![AppVeyor Badge]][AppVeyor]
 
 This package can be used to install and uninstall Node.js packages using npm.
 
@@ -80,3 +78,10 @@ Parameter | Description
 Option | Default | Description
 -|-
 `save` | `false` | Removes dependency from `package.json` iff `true`
+
+
+[Travis Badge]: https://travis-ci.org/apache/cordova-fetch.svg?branch=master
+[Travis]: https://travis-ci.org/apache/cordova-fetch
+
+[AppVeyor Badge]: https://ci.appveyor.com/api/projects/status/6xv212nihtcnbsov?svg=true
+[AppVeyor]: https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-fetch/branch/master
