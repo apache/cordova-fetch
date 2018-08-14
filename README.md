@@ -29,7 +29,7 @@ This package can be used to install and uninstall Node.js packages using npm.
 
 ## Usage
 
-### fetch
+### `fetch`
 
 Installs a module from npm, a git url or the local file system. Returns a `Promise` resolving to the absolute path to the installed package.
 
@@ -53,9 +53,9 @@ Parameter | Description
 
 Option | Default | Description
 -|-
-`save` | `false` | Adds the package as  dependency to `package.json` iff `true`
+`save` | `false` | Adds the package as dependency to `package.json` iff `true`
 
-### uninstall
+### `uninstall`
 
 Uninstalls a package from given directory. Returns a `Promise` that resolves when removal has finished
 
