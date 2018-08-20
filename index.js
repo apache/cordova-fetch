@@ -74,12 +74,17 @@ function npmArgs (target, userOptions) {
     if (opts.production) {
         args.push('--production');
     }
+    // save-exact could be enabled through .npmrc, so make sure to disable it
+    // to match our desired behavior.
     if (opts.save_exact) {
         args.push('--save-exact');
-    } else if (opts.save) {
-        args.push('--save');
     } else {
-        args.push('--no-save');
+        args.push('--save-exact=false');
+        if (opts.save) {
+            args.push('--save');
+        } else {
+            args.push('--no-save');
+        }
     }
     return args;
 }
