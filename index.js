@@ -102,8 +102,8 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
 function pathToInstalledPackage (spec, dest) {
     const { name, rawSpec } = npa(spec, dest);
     const paths = [];
-    for (const p = dest; path.dirname(p) !== p; p = path.dirname(p)) {
-     paths.push(path.join(p, 'node_modules'));
+    for (let p = dest; path.dirname(p) !== p; p = path.dirname(p)) {
+        paths.push(path.join(p, 'node_modules'));
     }
     return getInstalledPath(name, { local: true, paths: paths })
         .then(installPath => {
