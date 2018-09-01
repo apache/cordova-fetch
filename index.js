@@ -101,7 +101,11 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
 // is installed, rejects otherwise.
 function pathToInstalledPackage (spec, dest) {
     const { name, rawSpec } = npa(spec, dest);
-    return getInstalledPath(name, { local: true, cwd: dest })
+    const paths = [];
+    for (const p = dest; path.dirname(p) !== p; p = path.dirname(p)) {
+     paths.push(path.join(p, 'node_modules'));
+    }
+    return getInstalledPath(name, { local: true, paths: paths })
         .then(installPath => {
             const { version } = fs.readJsonSync(path.join(installPath, 'package.json'));
             if (!semver.satisfies(version, rawSpec)) {
