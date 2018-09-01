@@ -22,7 +22,7 @@ var events = require('cordova-common').events;
 var path = require('path');
 var fs = require('fs-extra');
 var CordovaError = require('cordova-common').CordovaError;
-const { getInstalledPath } = require('get-installed-path');
+const resolve = Q.denodeify(require('resolve'));
 const npa = require('npm-package-arg');
 const semver = require('semver');
 
@@ -100,19 +100,23 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
 // Resolves to installation path of package defined by spec if the right version
 // is installed, rejects otherwise.
 function pathToInstalledPackage (spec, dest) {
-    const { name, rawSpec } = npa(spec, dest);
-    const paths = [];
-    for (let p = dest; path.dirname(p) !== p; p = path.dirname(p)) {
-        paths.push(path.join(p, 'node_modules'));
-    }
-    return getInstalledPath(name, { local: true, paths: paths })
-        .then(installPath => {
-            const { version } = fs.readJsonSync(path.join(installPath, 'package.json'));
-            if (!semver.satisfies(version, rawSpec)) {
-                throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
-            }
-            return installPath;
-        });
+    return Promise.resolve().then(_ => {
+        const { name, rawSpec } = npa(spec, dest);
+
+        if (!name) {
+            throw new CordovaError(`Cannot determine package name from spec ${spec}`);
+        }
+
+        // We resolve the path to the module's package.json to avoid getting the
+        // path to `main` which could be located anywhere in the package
+        return resolve(path.join(name, 'package.json'), { basedir: dest })
+            .then(([pkgPath, { version }]) => {
+                if (!semver.satisfies(version, rawSpec)) {
+                    throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
+                }
+                return path.dirname(pkgPath);
+            });
+    });
 }
 
 /**
