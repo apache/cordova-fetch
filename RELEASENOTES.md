@@ -20,6 +20,10 @@
 -->
 # Cordova-fetch Release Notes
 
+### 1.3.1 (Sep 17, 2018)
+* [GH-20](https://github.com/apache/cordova-fetch/pull/20) Fix repo url in `package.json`
+* [CB-13503](https://issues.apache.org/jira/browse/CB-13503) fix trimID bug when using file:path/to/plugin ([GH-13](https://github.com/apache/cordova-fetch/pull/13))
+
 ### 1.3.0 (Dec 14, 2017)
 * [CB-13055](https://issues.apache.org/jira/browse/CB-13055): added workaround for when `jsonDiff` has more than one different key. 
 * Support git shortlink package references
