@@ -69,8 +69,9 @@ describe('fetch/uninstall tests via npm & git', function () {
             .then(_ => fetchAndMatch('cordova-android'))
             .then(_ => uninstall('cordova-android', tmpDir, opts))
             .then(_ => expectNotToBeInstalled('cordova-android'))
-
-            .then(_ => fetchAndMatch('https://github.com/apache/cordova-browser.git', { name: 'cordova-browser' }))
+            // this workaround is needed in 1.3.x since
+            // latest browser release dropped support for Node.js 4
+            .then(_ => fetchAndMatch('https://github.com/apache/cordova-browser.git#5.0.x', { name: 'cordova-browser' }))
             .then(_ => uninstall('cordova-browser', tmpDir, opts))
             .then(_ => expectNotToBeInstalled('cordova-browser'));
     }, 120000);
