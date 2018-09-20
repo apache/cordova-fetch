@@ -190,7 +190,7 @@ describe('negative tests', function () {
     }, 30000);
 });
 
-fdescribe('pathToInstalledPackage', function () {
+describe('pathToInstalledPackage', function () {
     let pathToInstalledPackage, expectedPath;
 
     beforeEach(function () {
