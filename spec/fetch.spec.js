@@ -204,7 +204,7 @@ describe('pathToInstalledPackage', function () {
         fs.mkdirpSync(path.join('nested-directory', 'nested-subdirectory'));
     });
 
-    function pathToInstalledPackageAndMatch(dest) {
+    function pathToInstalledPackageAndMatch (dest) {
         return pathToInstalledPackage('dummy-local-plugin', dest)
             .then(p => expect(p).toEqual(expectedPath));
     }
