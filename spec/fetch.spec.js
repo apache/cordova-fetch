@@ -23,6 +23,8 @@ var fs = require('fs-extra');
 var fileUrl = require('file-url');
 var helpers = require('./helpers.js');
 
+var rewire = require('rewire');
+
 var tmpDir, opts;
 
 beforeEach(function () {
@@ -186,4 +188,36 @@ describe('negative tests', function () {
                 expect(err).toBeDefined();
             });
     }, 30000);
+});
+
+fdescribe('pathToInstalledPackage', function () {
+    let pathToInstalledPackage, expectedPath;
+
+    beforeEach(function () {
+        pathToInstalledPackage = rewire('..').__get__('pathToInstalledPackage');
+
+        fs.mkdirSync('node_modules');
+
+        expectedPath = path.join(tmpDir, 'node_modules', 'dummy-local-plugin');
+        fs.copySync(path.join(__dirname, 'support', 'dummy-local-plugin'), expectedPath);
+
+        fs.mkdirpSync(path.join('nested-directory', 'nested-subdirectory'));
+    });
+
+    function pathToInstalledPackageAndMatch(dest) {
+        return pathToInstalledPackage('dummy-local-plugin', dest)
+            .then(p => expect(p).toEqual(expectedPath));
+    }
+
+    it('should find a package installed in the given directory', function () {
+        return pathToInstalledPackageAndMatch(tmpDir);
+    });
+
+    it('should find a package installed in the parent of the given directory', function () {
+        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'nested-directory'));
+    });
+
+    it('should find a package installed in an ancestor of the given directory', function () {
+        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'nested-directory', 'nested-subdirectory'));
+    });
 });
