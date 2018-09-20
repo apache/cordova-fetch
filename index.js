@@ -109,7 +109,10 @@ function pathToInstalledPackage (spec, dest) {
 
         // We resolve the path to the module's package.json to avoid getting the
         // path to `main` which could be located anywhere in the package
-        return resolve(path.join(name, 'package.json'), { basedir: dest })
+        return resolve(path.join(name, 'package.json'), {
+            basedir: dest,
+            paths: process.env.NODE_PATH ? process.env.NODE_PATH.split(path.delimiter) : []
+        })
             .then(([pkgPath, { version }]) => {
                 if (!semver.satisfies(version, rawSpec)) {
                     throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
