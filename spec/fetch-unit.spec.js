@@ -92,7 +92,7 @@ describe('resolvePathToPackage', () => {
         fs.removeSync(tmpDir);
     });
 
-    function resolvePathToPackageAndMatch (basedir) {
+    function resolveToExpectedPathFrom (basedir) {
         return Promise.resolve()
             .then(_ => fs.mkdirp(basedir))
             .then(_ => resolvePathToPackage('dummy-local-plugin', basedir))
@@ -111,11 +111,11 @@ describe('resolvePathToPackage', () => {
     });
 
     it('should find a package installed in the parent of the given directory', () => {
-        return resolvePathToPackageAndMatch(path.join(tmpDir, 'app/nested-directory'));
+        return resolveToExpectedPathFrom(path.join(tmpDir, 'app/nested-directory'));
     });
 
     it('should find a package installed in an ancestor of the given directory', () => {
-        return resolvePathToPackageAndMatch(path.join(tmpDir, 'app/nested-directory/nested-subdirectory'));
+        return resolveToExpectedPathFrom(path.join(tmpDir, 'app/nested-directory/nested-subdirectory'));
     });
 
     it('should not find a package installed elsewhere', () => {
@@ -127,6 +127,6 @@ describe('resolvePathToPackage', () => {
 
     it('should find a package installed at $NODE_PATH', () => {
         process.env.NODE_PATH = path.join(tmpDir, 'app/node_modules');
-        return resolvePathToPackageAndMatch(path.join(tmpDir, 'another-app'));
+        return resolveToExpectedPathFrom(path.join(tmpDir, 'another-app'));
     });
 });
