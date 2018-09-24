@@ -102,23 +102,32 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
 function pathToInstalledPackage (spec, dest) {
     return Promise.resolve().then(_ => {
         const { name, rawSpec } = npa(spec, dest);
-
         if (!name) {
             throw new CordovaError(`Cannot determine package name from spec ${spec}`);
         }
-
-        // We resolve the path to the module's package.json to avoid getting the
-        // path to `main` which could be located anywhere in the package
-        return resolve(path.join(name, 'package.json'), {
-            basedir: dest,
-            paths: process.env.NODE_PATH ? process.env.NODE_PATH.split(path.delimiter) : []
-        })
+        return resolvePathToPackage(name, dest)
             .then(([pkgPath, { version }]) => {
                 if (!semver.satisfies(version, rawSpec)) {
                     throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
                 }
-                return path.dirname(pkgPath);
+                return pkgPath;
             });
+    });
+}
+
+// Resolves to installation path and package.json of package `name` starting
+// from `basedir`
+function resolvePathToPackage (name, basedir) {
+    return Promise.resolve().then(_ => {
+        const { NODE_PATH } = process.env;
+        const paths = NODE_PATH ? NODE_PATH.split(path.delimiter) : [];
+
+        // We resolve the path to the module's package.json to avoid getting the
+        // path to `main` which could be located anywhere in the package
+        return resolve(path.join(name, 'package.json'), { paths, basedir })
+            .then(([pkgJsonPath, pkgJson]) => [
+                path.dirname(pkgJsonPath), pkgJson
+            ]);
     });
 }
 
