@@ -23,8 +23,6 @@ var fs = require('fs-extra');
 var fileUrl = require('file-url');
 var helpers = require('./helpers.js');
 
-var rewire = require('rewire');
-
 var tmpDir, opts;
 
 beforeEach(function () {
@@ -188,49 +186,4 @@ describe('negative tests', function () {
                 expect(err).toBeDefined();
             });
     }, 30000);
-});
-
-describe('pathToInstalledPackage', function () {
-    let pathToInstalledPackage, expectedPath;
-
-    beforeEach(function () {
-        pathToInstalledPackage = rewire('..').__get__('pathToInstalledPackage');
-
-        fs.mkdirpSync(path.join('app', 'node_modules'));
-
-        expectedPath = path.join(tmpDir, 'app', 'node_modules', 'dummy-local-plugin');
-        fs.copySync(path.join(__dirname, 'support', 'dummy-local-plugin'), expectedPath);
-
-        fs.mkdirpSync(path.join('app', 'nested-directory', 'nested-subdirectory'));
-
-        fs.mkdirSync(path.join('another-app'));
-    });
-
-    function pathToInstalledPackageAndMatch (dest) {
-        return pathToInstalledPackage('dummy-local-plugin', dest)
-            .then(p => expect(p).toEqual(expectedPath));
-    }
-
-    it('should find a package installed in the given directory', function () {
-        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'app'));
-    });
-
-    it('should find a package installed in the parent of the given directory', function () {
-        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'app', 'nested-directory'));
-    });
-
-    it('should find a package installed in an ancestor of the given directory', function () {
-        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'app', 'nested-directory', 'nested-subdirectory'));
-    });
-
-    it('should not find a package installed elsewhere', function () {
-        return pathToInstalledPackage('dummy-local-plugin')
-            .then(_ => fail('expect promise to be rejected'))
-            .catch(err => expect(err).toBeDefined());
-    });
-
-    it('should find a package installed at $NODE_PATH', function () {
-        process.env.NODE_PATH = path.join(tmpDir, 'app', 'node_modules');
-        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'another-app'));
-    });
 });

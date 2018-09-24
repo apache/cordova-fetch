@@ -15,7 +15,10 @@
     under the License.
 */
 
+const fs = require('fs-extra');
+const path = require('path');
 const rewire = require('rewire');
+const { tmpDir: getTmpDir } = require('./helpers.js');
 
 describe('fetch', function () {
     let fetch, installPackage;
@@ -72,5 +75,56 @@ describe('npmArgs', function () {
     it('when save is false, no-save flag should be passed through', function () {
         var opts = { cwd: 'some/path', production: true, save: false };
         expect(npmArgs('platform', opts)).toContain('--no-save');
+    });
+});
+
+describe('pathToInstalledPackage', function () {
+    let tmpDir, pathToInstalledPackage, expectedPath;
+
+    beforeEach(function () {
+        tmpDir = getTmpDir();
+
+        pathToInstalledPackage = rewire('..').__get__('pathToInstalledPackage');
+
+        fs.mkdirpSync(path.join(tmpDir, 'app', 'node_modules'));
+
+        expectedPath = path.join(tmpDir, 'app', 'node_modules', 'dummy-local-plugin');
+        fs.copySync(path.join(__dirname, 'support', 'dummy-local-plugin'), expectedPath);
+
+        fs.mkdirpSync(path.join(tmpDir, 'app', 'nested-directory', 'nested-subdirectory'));
+
+        fs.mkdirSync(path.join(tmpDir, 'another-app'));
+    });
+
+    afterEach(function () {
+        fs.removeSync(tmpDir);
+    });
+
+    function pathToInstalledPackageAndMatch (dest) {
+        return pathToInstalledPackage('dummy-local-plugin', dest)
+            .then(p => expect(p).toEqual(expectedPath));
+    }
+
+    it('should find a package installed in the given directory', function () {
+        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'app'));
+    });
+
+    it('should find a package installed in the parent of the given directory', function () {
+        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'app', 'nested-directory'));
+    });
+
+    it('should find a package installed in an ancestor of the given directory', function () {
+        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'app', 'nested-directory', 'nested-subdirectory'));
+    });
+
+    it('should not find a package installed elsewhere', function () {
+        return pathToInstalledPackage('dummy-local-plugin')
+            .then(_ => fail('expect promise to be rejected'))
+            .catch(err => expect(err).toBeDefined());
+    });
+
+    it('should find a package installed at $NODE_PATH', function () {
+        process.env.NODE_PATH = path.join(tmpDir, 'app', 'node_modules');
+        return pathToInstalledPackageAndMatch(path.join(tmpDir, 'another-app'));
     });
 });
