@@ -118,9 +118,10 @@ describe('pathToInstalledPackage', function () {
     });
 
     it('should not find a package installed elsewhere', function () {
-        return pathToInstalledPackage('dummy-local-plugin')
-            .then(_ => fail('expect promise to be rejected'))
-            .catch(err => expect(err).toBeDefined());
+        return pathToInstalledPackage('dummy-local-plugin').then(
+            _ => fail('expect promise to be rejected'),
+            err => expect(err).toBeDefined()
+        );
     });
 
     it('should find a package installed at $NODE_PATH', function () {
