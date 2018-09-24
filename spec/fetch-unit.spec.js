@@ -99,8 +99,15 @@ describe('resolvePathToPackage', () => {
             .then(([p]) => expect(p).toEqual(expectedPath));
     }
 
-    it('should find a package installed in the given directory', () => {
-        return resolvePathToPackageAndMatch(path.join(tmpDir, 'app'));
+    it('should return path and package.json of an installed package', () => {
+        return Promise.resolve(path.join(tmpDir, 'app'))
+            .then(basedir => resolvePathToPackage('dummy-local-plugin', basedir))
+            .then(([pkgPath, pkgJson]) => {
+                expect(pkgPath).toEqual(expectedPath);
+                expect(pkgJson).toEqual(jasmine.objectContaining({
+                    name: 'test-plugin', version: '1.0.0'
+                }));
+            });
     });
 
     it('should find a package installed in the parent of the given directory', () => {
