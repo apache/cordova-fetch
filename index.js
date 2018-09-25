@@ -57,11 +57,17 @@ module.exports = function (target, dest, opts = {}) {
 // Installs the package specified by target and returns the installation path
 function installPackage (target, dest, opts) {
     return isNpmInstalled()
+        // Ensure that we install to `dest` and not any of its ancestors
+        .then(_ => fs.ensureDir(path.join(dest, 'node_modules')))
+
+        // Run `npm` to install requested package
         .then(_ => npmArgs(target, opts))
         .then(args => {
             events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
             return superspawn.spawn('npm', args, { cwd: dest });
         })
+
+        // Resolve path to installed package
         .then(getTargetPackageSpecFromNpmInstallOutput)
         .then(spec => pathToInstalledPackage(spec, dest));
 }
