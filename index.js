@@ -57,7 +57,7 @@ module.exports = function (target, dest, opts = {}) {
 // Installs the package specified by target and returns the installation path
 function installPackage (target, dest, opts) {
     return isNpmInstalled()
-        // Ensure that we install to `dest` and not any of its ancestors
+        // Ensure that `npm` installs to `dest` and not any of its ancestors
         .then(_ => fs.ensureDir(path.join(dest, 'node_modules')))
 
         // Run `npm` to install requested package
