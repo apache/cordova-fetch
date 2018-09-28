@@ -187,3 +187,29 @@ describe('negative tests', function () {
             });
     }, 30000);
 });
+
+describe('fetching with node_modules in ancestor dirs', () => {
+    let fetchTarget, fetchDestination;
+
+    beforeEach(() => {
+        const testRoot = path.join(tmpDir, 'test-root');
+        fetchDestination = path.join(testRoot, 'fetch-dest');
+        fs.ensureDirSync(fetchDestination);
+
+        // Make test root look like a package root directory
+        fs.ensureDirSync(path.join(testRoot, 'node_modules'));
+        fs.outputJsonSync(path.join(testRoot, 'package.json'), { private: true });
+
+        // Copy test fixtures to avoid linking out of temp directory
+        fs.copySync(path.join(__dirname, 'support'), 'support');
+        fetchTarget = fileUrl(path.resolve('support/dummy-local-plugin'));
+    });
+
+    it('should still install to given destination', function () {
+        const expectedInstallPath = path.join(fetchDestination, 'node_modules/test-plugin');
+
+        return fetch(fetchTarget, fetchDestination).then(pkgInstallPath => {
+            expect(pkgInstallPath).toBe(expectedInstallPath);
+        });
+    }, 10 * 1000);
+});
