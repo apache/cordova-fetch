@@ -43,10 +43,9 @@
     "nyc": "^12.0.2"
   },
   "scripts": {
-    "test": "npm run eslint && npm run jasmine",
-    "cover": "nyc jasmine --config=spec/coverage.json",
-    "eslint": "eslint .",
-    "jasmine": "jasmine spec/fetch.spec.js spec/fetch-unit.spec.js"
+    "test": "npm run eslint && npm run cover",
+    "cover": "nyc jasmine",
+    "eslint": "eslint --ignore-path .gitignore ."
   },
   "engines": {
     "node": ">= 6",
