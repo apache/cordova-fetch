@@ -79,16 +79,22 @@ describe('npmArgs', function () {
 });
 
 describe('resolvePathToPackage', () => {
-    let tmpDir, resolvePathToPackage, expectedPath;
+    let tmpDir, resolvePathToPackage, expectedPath, NODE_PATH;
 
     beforeEach(() => {
         tmpDir = getTmpDir();
         resolvePathToPackage = rewire('..').__get__('resolvePathToPackage');
         expectedPath = path.join(tmpDir, 'app/node_modules/dummy-local-plugin');
         fs.copySync(path.join(__dirname, 'support/dummy-local-plugin'), expectedPath);
+
+        NODE_PATH = process.env.NODE_PATH;
+        delete process.env.NODE_PATH;
     });
 
     afterEach(() => {
+        if (NODE_PATH !== undefined) {
+            process.env.NODE_PATH = NODE_PATH;
+        }
         fs.removeSync(tmpDir);
     });
 
@@ -128,5 +134,13 @@ describe('resolvePathToPackage', () => {
     it('should find a package installed at $NODE_PATH', () => {
         process.env.NODE_PATH = path.join(tmpDir, 'app/node_modules');
         return resolveToExpectedPathFrom(path.join(tmpDir, 'another-app'));
+    });
+
+    it('should gracefully handle broken $NODE_PATH', () => {
+        process.env.NODE_PATH = path.delimiter;
+        return resolvePathToPackage('dummy-local-plugin', tmpDir).then(
+            _ => fail('expect promise to be rejected'),
+            err => expect(err).toBeDefined()
+        );
     });
 });
