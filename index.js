@@ -125,8 +125,9 @@ function pathToInstalledPackage (spec, dest) {
 // from `basedir`
 function resolvePathToPackage (name, basedir) {
     return Promise.resolve().then(_ => {
-        const { NODE_PATH } = process.env;
-        const paths = NODE_PATH ? NODE_PATH.split(path.delimiter) : [];
+        const paths = (process.env.NODE_PATH || '')
+            .split(path.delimiter)
+            .filter(p => p);
 
         // We resolve the path to the module's package.json to avoid getting the
         // path to `main` which could be located anywhere in the package
