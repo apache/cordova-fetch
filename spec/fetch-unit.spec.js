@@ -119,7 +119,7 @@ describe('resolvePathToPackage', () => {
     });
 
     it('should not find a package installed elsewhere', () => {
-        return resolvePathToPackage('dummy-local-plugin').then(
+        return resolvePathToPackage('dummy-local-plugin', tmpDir).then(
             _ => fail('expect promise to be rejected'),
             err => expect(err).toBeDefined()
         );
