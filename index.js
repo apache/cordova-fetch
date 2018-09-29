@@ -15,14 +15,14 @@
  under the License.
  */
 
-var Q = require('q');
-var which = Q.denodeify(require('which'));
+const pify = require('pify');
+const which = pify(require('which'));
 var superspawn = require('cordova-common').superspawn;
 var events = require('cordova-common').events;
 var path = require('path');
 var fs = require('fs-extra');
 var CordovaError = require('cordova-common').CordovaError;
-const resolve = Q.denodeify(require('resolve'));
+const resolve = pify(require('resolve'), { multiArgs: true });
 const npa = require('npm-package-arg');
 const semver = require('semver');
 
@@ -37,7 +37,7 @@ const semver = require('semver');
  * @return {Promise<string>}    Absolute path to the installed package
  */
 module.exports = function (target, dest, opts = {}) {
-    return Q()
+    return Promise.resolve()
         .then(function () {
             if (!dest || !target) {
                 throw new CordovaError('Need to supply a target and destination');
