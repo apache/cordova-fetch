@@ -39,15 +39,25 @@
     "eslint-plugin-standard": "^3.1.0",
     "file-url": "^2.0.2",
     "jasmine": "^2.4.1",
-    "rewire": "^4.0.1"
+    "rewire": "^4.0.1",
+    "nyc": "^12.0.2"
   },
   "scripts": {
-    "test": "npm run eslint && npm run jasmine",
-    "eslint": "eslint .",
-    "jasmine": "jasmine spec/fetch.spec.js spec/fetch-unit.spec.js"
+    "test": "npm run eslint && npm run cover",
+    "cover": "nyc jasmine",
+    "eslint": "eslint --ignore-path .gitignore ."
   },
   "engines": {
     "node": ">= 6",
     "npm": ">= 3"
+  },
+  "nyc": {
+    "include": [
+      "index.js"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ]
   }
 }
