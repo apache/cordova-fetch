@@ -20,6 +20,45 @@
 -->
 # Cordova-fetch Release Notes
 
+### 2.0.0 (Dec 20, 2018)
+* dependency updates (cordova-common@3, etc.)
+* Collect test coverage during `npm test` (#48)
+* Drop Q, use native promises (#49)
+* Handle broken NODE_PATH setups gracefully (#50)
+* Run test in well-defined directory (#51)
+* Look for node_modules in any recursive parent directory (#44)
+* Add ESLint config file for tests (#41)
+* Improve and update docs (#42)
+* GH-35 .ratignore ignore *.git
+* GH-35 add license header to dummy-local-plugin
+* dos2unix spec/support/dummy-local-plugin/plugin.xml
+* eslint devDep updates (#28)
+* [CB-14173](https://issues.apache.org/jira/browse/CB-14173) Fix cordova <platform|plugin> add --link (#26)
+* [CB-14133](https://issues.apache.org/jira/browse/CB-14133) Avoid fetching already installed packages
+* Speed up tests by about 250%
+* Simplify fetch unit tests
+* Move and rename some e2e tests
+* Refactor fetch e2e tests
+* Refactor fetch code
+* Use fs.readJsonSync for reading `package.json` to avoid caching
+* Replace shelljs with fs-extra and which
+* Simplify tempDir setup in tests
+* Don't manually delete node_modules contents
+* Simplify installation location retrieval (#18)
+* Handle missing options (#22)
+* Add workaround for failing tests on AppVeyor/Node10
+* [CB-14066](https://issues.apache.org/jira/browse/CB-14066) Drop support for Node 4
+* Fix repo url in `package.json` (#20)
+* Increase test timeouts to reduce spurious failures (#19)
+* Isolate Q usage to prepare later removal
+* Fail test if promise unexpectedly resolves
+* Let jasmine handle promises
+* Fix linting errors
+* Lint all *.js files in the repo
+* [CB-13503](https://issues.apache.org/jira/browse/CB-13503) fix trimID bug when using file:path/to/plugin
+* Adding a unit test
+* Enabling support for git+http
+
 ### 1.3.0 (Dec 14, 2017)
 * [CB-13055](https://issues.apache.org/jira/browse/CB-13055): added workaround for when `jsonDiff` has more than one different key. 
 * Support git shortlink package references
