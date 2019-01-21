@@ -78,6 +78,44 @@ describe('npmArgs', function () {
     });
 });
 
+describe('getTargetPackageSpecFromNpmInstallOutput', () => {
+    const fetch = rewire('..');
+    const getTargetPackageSpecFromNpmInstallOutput = fetch.__get__('getTargetPackageSpecFromNpmInstallOutput');
+    const outputSampleNpm5 = '+ cordova-electron@1.0.0-dev';
+    const outputSampleNpm3 = 'helloworld@1.0.0 /cordova-project\n' +
+                             '└─┬ cordova-electron@1.0.0-dev  (git://github.com/apache/cordova-electron.git)';
+    const outputSampleNpm5WithPostinstall = '> electron@3.1.1 postinstall /cordova-project/node_modules/electron\n' +
+                                            '> node install.js\n\n' +
+                                            '+ cordova-electron@1.0.0-dev\n';
+    const outputSampleNpm3WithPostinstall = '> electron@3.1.1 postinstall /cordova-project/node_modules/electron\n' +
+                                            '> node install.js\n' +
+                                            'helloworld@1.0.0 /cordova-project\n' +
+                                            '└─┬ cordova-electron@1.0.0-dev  (git://github.com/apache/cordova-electron.git)';
+    const wrongOutputSample = 'Wrong output';
+
+    it('should parse the package name using  npm >= 5', () => {
+        expect(getTargetPackageSpecFromNpmInstallOutput(outputSampleNpm5)).toEqual('cordova-electron@1.0.0-dev');
+    });
+
+    it('should parse the package name using npm 3 <= npm <= 4', () => {
+        expect(getTargetPackageSpecFromNpmInstallOutput(outputSampleNpm3)).toEqual('cordova-electron@1.0.0-dev');
+    });
+
+    it('should parse the package name using npm >= 5 with postinstall ', () => {
+        expect(getTargetPackageSpecFromNpmInstallOutput(outputSampleNpm5WithPostinstall)).toEqual('cordova-electron@1.0.0-dev');
+    });
+
+    it('should parse the package name using npm 3 <= npm <= 4 with postinstall', () => {
+        expect(getTargetPackageSpecFromNpmInstallOutput(outputSampleNpm3WithPostinstall)).toEqual('cordova-electron@1.0.0-dev');
+    });
+
+    it('should gracefully handle if could not determine the package name from output', () => {
+        expect(() => {
+            getTargetPackageSpecFromNpmInstallOutput(wrongOutputSample);
+        }).toThrow(new Error('Could not determine package name from output:\n' + wrongOutputSample));
+    });
+});
+
 describe('resolvePathToPackage', () => {
     let tmpDir, resolvePathToPackage, expectedPath, NODE_PATH;
 
