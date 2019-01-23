@@ -92,15 +92,16 @@ function npmArgs (target, userOptions) {
 
 function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
     const lines = npmInstallOutput.split('\n');
-    if (lines[0].startsWith('+ ')) {
-        // npm >= 5
-        return lines[0].slice(2);
-    } else if (lines[1].startsWith('└─') || lines[1].startsWith('`-')) {
-        // 3 <= npm <= 4
-        return lines[1].slice(4).split(' ')[0];
-    } else {
-        throw new CordovaError('Could not determine package name from output:\n' + npmInstallOutput);
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].startsWith('+ ')) {
+            // npm >= 5
+            return lines[i].slice(2);
+        } else if (lines[i].startsWith('└─') || lines[i].startsWith('`-')) {
+            // 3 <= npm <= 4
+            return lines[i].slice(4).split(' ')[0];
+        }
     }
+    throw new CordovaError('Could not determine package name from output:\n' + npmInstallOutput);
 }
 
 // Resolves to installation path of package defined by spec if the right version
