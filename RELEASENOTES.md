@@ -20,6 +20,25 @@
 -->
 # Cordova-fetch Release Notes
 
+### 2.0.1 (Mar 18, 2019)
+
+* [GH-61](https://github.com/apache/cordova-fetch/pull/61) Prepare Fetch 2.0.1 Patch Release
+  * Bumped Dependencies
+    * `cordova-common@^3.1.0`
+    * `fs-extra@^7.0.1`
+    * `pify@^4.0.1`
+    * `resolve@^1.10.0`
+    * `semver@^5.6.0`
+  * Bumped Dev Dependencies
+    * `eslint@^5.15.2`
+    * `eslint-plugin-import@^2.16.0`
+    * `eslint-plugin-node@^8.0.1`
+    * `eslint-plugin-promise@^4.0.1`
+    * `jasmine@^3.3.1`
+    * `nyc@^13.3.0`
+    * `rewire@^4.0.1`
+* [GH-60](https://github.com/apache/cordova-fetch/pull/60) Properly detect npm install package name
+
 ### 2.0.0 (Dec 20, 2018)
 * dependency updates (cordova-common@3, etc.)
 * Collect test coverage during `npm test` (#48)
