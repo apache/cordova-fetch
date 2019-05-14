@@ -72,18 +72,14 @@ function installPackage (target, dest, opts) {
         .then(spec => pathToInstalledPackage(spec, dest));
 }
 
-function npmArgs (target, userOptions) {
-    const opts = Object.assign({ production: true }, userOptions);
-
+function npmArgs (target, opts) {
     const args = ['install', target];
+    opts = opts || {};
 
-    if (opts.production) {
-        args.push('--production');
-    }
     if (opts.save_exact) {
         args.push('--save-exact');
     } else if (opts.save) {
-        args.push('--save');
+        args.push('--save-dev');
     } else {
         args.push('--no-save');
     }
@@ -171,9 +167,9 @@ module.exports.uninstall = function (target, dest, opts) {
             // set the directory where npm uninstall will be run
             opts.cwd = dest;
 
-            // if user added --save flag, pass it to npm uninstall command
+            // if user added --save flag, pass --save-dev flag to npm uninstall command
             if (opts.save) {
-                fetchArgs.push('--save');
+                fetchArgs.push('--save-dev');
             } else {
                 fetchArgs.push('--no-save');
             }

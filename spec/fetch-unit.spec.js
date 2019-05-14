@@ -57,23 +57,18 @@ describe('npmArgs', function () {
         npmArgs('platform');
     });
 
-    it('npm install should be called with production flag (default)', function () {
-        var opts = { cwd: 'some/path', production: true, save: true };
-        expect(npmArgs('platform', opts)).toContain('--production');
-    });
-
-    it('save-exact should be true if passed in', function () {
+    it('when save_exact is true, save-exact flag should be passed through to npm', function () {
         var opts = { cwd: 'some/path', save_exact: true };
         expect(npmArgs('platform', opts)).toContain('--save-exact');
     });
 
-    it('noprod should turn production off', function () {
-        var opts = { cwd: 'some/path', production: false };
-        expect(npmArgs('platform', opts)).not.toContain('--production');
+    it('when save is true, save-dev flag should be passed through to npm', function () {
+        var opts = { cwd: 'some/path', save: true };
+        expect(npmArgs('platform', opts)).toContain('--save-dev');
     });
 
-    it('when save is false, no-save flag should be passed through', function () {
-        var opts = { cwd: 'some/path', production: true, save: false };
+    it('when save is false, no-save flag should be passed through to npm', function () {
+        var opts = { cwd: 'some/path', save: false };
         expect(npmArgs('platform', opts)).toContain('--no-save');
     });
 });
