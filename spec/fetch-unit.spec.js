@@ -40,7 +40,7 @@ describe('fetch', function () {
     });
 
     it('should install package if not found', function () {
-        fetch.__set__({ pathToInstalledPackage: _ => Promise.reject() });
+        fetch.__set__({ pathToInstalledPackage: _ => Promise.reject(new Error()) });
 
         return fetch('foo', 'bar').then(result => {
             expect(result).toBe('/foo');
