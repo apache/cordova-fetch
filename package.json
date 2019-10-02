@@ -43,9 +43,10 @@
     "rewire": "^4.0.1"
   },
   "scripts": {
-    "test": "npm run eslint && npm run cover",
-    "cover": "nyc jasmine",
-    "eslint": "eslint --ignore-path .gitignore ."
+    "eslint": "eslint --ignore-path .gitignore .",
+    "test": "npm run eslint && npm run test:coverage",
+    "test:unit": "jasmine --config=spec/support/jasmine.json",
+    "test:coverage": "nyc npm run test:unit"
   },
   "engines": {
     "node": ">= 6",
