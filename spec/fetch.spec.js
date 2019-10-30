@@ -89,21 +89,21 @@ describe('fetch/uninstall with --save', function () {
     it('should fetch and uninstall a cordova platform via npm & git tags/branches', function () {
         return Promise.resolve()
             // npm tag
-            .then(_ => fetchAndMatch('cordova-android@5.1.1', {
+            .then(_ => fetchAndMatch('cordova-android@8.1.0', {
                 name: 'cordova-android',
-                version: '5.1.1'
+                version: '8.1.0'
             }))
-            .then(_ => expectDependenciesToBe({ 'cordova-android': '^5.1.1' }))
+            .then(_ => expectDependenciesToBe({ 'cordova-android': '^8.1.0' }))
             .then(_ => uninstall('cordova-android', tmpDir, opts))
             .then(_ => expectDependenciesToBe({}))
             .then(_ => expectNotToBeInstalled('cordova-android'))
 
             // git tag
-            .then(_ => fetchAndMatch('https://github.com/apache/cordova-ios.git#rel/4.1.1', {
+            .then(_ => fetchAndMatch('https://github.com/apache/cordova-ios.git#rel/5.0.1', {
                 name: 'cordova-ios',
-                version: '4.1.1'
+                version: '5.0.1'
             }))
-            .then(_ => expectDependenciesToBe({ 'cordova-ios': 'git+https://github.com/apache/cordova-ios.git#rel/4.1.1' }))
+            .then(_ => expectDependenciesToBe({ 'cordova-ios': 'git+https://github.com/apache/cordova-ios.git#rel/5.0.1' }))
             .then(_ => uninstall('cordova-ios', tmpDir, opts))
             .then(_ => expectDependenciesToBe({}))
             .then(_ => expectNotToBeInstalled('cordova-ios'))
