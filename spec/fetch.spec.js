@@ -55,9 +55,9 @@ function expectNotToBeInstalled (pkgName) {
     expect(fs.existsSync(path.join(tmpDir, 'node_modules', pkgName))).toBe(false);
 }
 
-function expectDependenciesToBe (deps) {
+function expectDevDependenciesToBe (deps) {
     const rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
-    expect(rootPJ.dependencies).toEqual(deps);
+    expect(rootPJ.devDependencies).toEqual(deps);
 }
 
 describe('fetch/uninstall tests via npm & git', function () {
@@ -93,9 +93,9 @@ describe('fetch/uninstall with --save', function () {
                 name: 'cordova-android',
                 version: '8.1.0'
             }))
-            .then(_ => expectDependenciesToBe({ 'cordova-android': '^8.1.0' }))
+            .then(_ => expectDevDependenciesToBe({ 'cordova-android': '^8.1.0' }))
             .then(_ => uninstall('cordova-android', tmpDir, opts))
-            .then(_ => expectDependenciesToBe({}))
+            .then(_ => expectDevDependenciesToBe({}))
             .then(_ => expectNotToBeInstalled('cordova-android'))
 
             // git tag
@@ -103,9 +103,9 @@ describe('fetch/uninstall with --save', function () {
                 name: 'cordova-ios',
                 version: '5.0.1'
             }))
-            .then(_ => expectDependenciesToBe({ 'cordova-ios': 'git+https://github.com/apache/cordova-ios.git#rel/5.0.1' }))
+            .then(_ => expectDevDependenciesToBe({ 'cordova-ios': 'git+https://github.com/apache/cordova-ios.git#rel/5.0.1' }))
             .then(_ => uninstall('cordova-ios', tmpDir, opts))
-            .then(_ => expectDependenciesToBe({}))
+            .then(_ => expectDevDependenciesToBe({}))
             .then(_ => expectNotToBeInstalled('cordova-ios'))
 
             // git branch
@@ -113,7 +113,7 @@ describe('fetch/uninstall with --save', function () {
                 name: 'cordova-android',
                 version: '4.1.1'
             }))
-            .then(_ => expectDependenciesToBe({ 'cordova-android': 'git+https://github.com/apache/cordova-android.git#4.1.x' }))
+            .then(_ => expectDevDependenciesToBe({ 'cordova-android': 'git+https://github.com/apache/cordova-android.git#4.1.x' }))
             .then(_ => uninstall('cordova-android', tmpDir, opts));
     }, 150000);
 
@@ -124,9 +124,9 @@ describe('fetch/uninstall with --save', function () {
                 name: 'cordova-plugin-contacts',
                 version: '2.0.2-dev'
             }))
-            .then(_ => expectDependenciesToBe({ 'cordova-plugin-contacts': `git+${URL}` }))
+            .then(_ => expectDevDependenciesToBe({ 'cordova-plugin-contacts': `git+${URL}` }))
             .then(_ => uninstall('cordova-plugin-contacts', tmpDir, opts))
-            .then(_ => expectDependenciesToBe({}))
+            .then(_ => expectDevDependenciesToBe({}))
             .then(_ => expectNotToBeInstalled('cordova-plugin-contacts'));
     }, 30000);
 });
