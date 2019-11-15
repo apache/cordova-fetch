@@ -61,7 +61,6 @@ function expectDevDependenciesToBe (deps) {
 }
 
 describe('fetch/uninstall tests via npm & git', function () {
-
     it('should fetch and uninstall a cordova platform via npm & git', function () {
         return Promise.resolve()
             .then(_ => fetchAndMatch('cordova-android'))
@@ -79,7 +78,6 @@ describe('fetch/uninstall tests via npm & git', function () {
 });
 
 describe('fetch/uninstall with --save', function () {
-
     beforeEach(function () {
         opts = { save: true };
         // copy package.json from spec directory to tmpDir
@@ -132,7 +130,6 @@ describe('fetch/uninstall with --save', function () {
 });
 
 describe('fetching already installed packages', function () {
-
     beforeEach(function () {
         fs.copySync(path.join(__dirname, 'support'), 'support');
     });
@@ -166,7 +163,6 @@ describe('fetching already installed packages', function () {
 });
 
 describe('negative tests', function () {
-
     it('should fail fetching a module that does not exist on npm', function () {
         return fetch('NOTAMODULE', tmpDir, opts)
             .then(function (result) {
