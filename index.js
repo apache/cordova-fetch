@@ -34,23 +34,19 @@ const semver = require('semver');
  *
  * @return {Promise<string>}    Absolute path to the installed package
  */
-module.exports = function (target, dest, opts = {}) {
-    return Promise.resolve()
-        .then(function () {
-            if (!dest || !target) {
-                throw new CordovaError('Need to supply a target and destination');
-            }
-            // Create dest if it doesn't exist yet
-            fs.ensureDirSync(dest);
-        })
-        .then(_ => {
-            return pathToInstalledPackage(target, dest)
-                .catch(_ => installPackage(target, dest, opts));
-        })
-        .catch(function (err) {
-            throw new CordovaError(err);
-        });
-};
+module.exports = (target, dest, opts = {}) => Promise.resolve()
+    .then(() => {
+        if (!dest || !target) {
+            throw new CordovaError('Need to supply a target and destination');
+        }
+        // Create dest if it doesn't exist yet
+        fs.ensureDirSync(dest);
+    })
+    .then(_ => pathToInstalledPackage(target, dest))
+    .catch(_ => installPackage(target, dest, opts))
+    .catch(err => {
+        throw new CordovaError(err);
+    });
 
 // Installs the package specified by target and returns the installation path
 function installPackage (target, dest, opts) {
@@ -150,13 +146,13 @@ module.exports.isNpmInstalled = isNpmInstalled;
  *
  * @return {Promise<string>}    Resolves when removal has finished
  */
-module.exports.uninstall = function (target, dest, opts) {
+module.exports.uninstall = (target, dest, opts) => {
     const fetchArgs = ['uninstall'];
     opts = opts || {};
 
     // check if npm is installed on the system
     return isNpmInstalled()
-        .then(function () {
+        .then(() => {
             if (dest && target) {
                 // add target to fetchArgs Array
                 fetchArgs.push(target);
@@ -176,7 +172,7 @@ module.exports.uninstall = function (target, dest, opts) {
             // from package.json if --save was used.
             return superspawn.spawn('npm', fetchArgs, opts);
         })
-        .catch(function (err) {
+        .catch(err => {
             throw new CordovaError(err);
         });
 };

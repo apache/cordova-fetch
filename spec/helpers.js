@@ -22,6 +22,4 @@ const fs = require('fs-extra');
 const os = require('os');
 
 const tmpDirTemplate = path.join(os.tmpdir(), 'cordova-fetch-tests-');
-module.exports.tmpDir = function () {
-    return fs.mkdtempSync(tmpDirTemplate);
-};
+module.exports.tmpDir = () => fs.mkdtempSync(tmpDirTemplate);

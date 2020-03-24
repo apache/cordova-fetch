@@ -20,17 +20,17 @@ const path = require('path');
 const rewire = require('rewire');
 const { tmpDir: getTmpDir } = require('./helpers.js');
 
-describe('fetch', function () {
+describe('fetch', () => {
     let fetch, installPackage;
 
-    beforeEach(function () {
+    beforeEach(() => {
         fetch = rewire('..');
         installPackage = jasmine.createSpy()
             .and.returnValue(Promise.resolve('/foo'));
         fetch.__set__({ fs: { ensureDirSync: _ => _ }, installPackage });
     });
 
-    it('should return path to installed package', function () {
+    it('should return path to installed package', () => {
         fetch.__set__({ pathToInstalledPackage: _ => Promise.resolve('/foo') });
 
         return fetch('foo', 'bar').then(result => {
@@ -39,7 +39,7 @@ describe('fetch', function () {
         });
     });
 
-    it('should install package if not found', function () {
+    it('should install package if not found', () => {
         fetch.__set__({ pathToInstalledPackage: _ => Promise.reject(new Error()) });
 
         return fetch('foo', 'bar').then(result => {
@@ -49,25 +49,25 @@ describe('fetch', function () {
     });
 });
 
-describe('npmArgs', function () {
+describe('npmArgs', () => {
     const fetch = rewire('..');
     const npmArgs = fetch.__get__('npmArgs');
 
-    it('should handle missing options', function () {
+    it('should handle missing options', () => {
         npmArgs('platform');
     });
 
-    it('when save_exact is true, save-exact flag should be passed through to npm', function () {
+    it('when save_exact is true, save-exact flag should be passed through to npm', () => {
         const opts = { cwd: 'some/path', save_exact: true };
         expect(npmArgs('platform', opts)).toContain('--save-exact');
     });
 
-    it('when save is true, save-dev flag should be passed through to npm', function () {
+    it('when save is true, save-dev flag should be passed through to npm', () => {
         const opts = { cwd: 'some/path', save: true };
         expect(npmArgs('platform', opts)).toContain('--save-dev');
     });
 
-    it('when save is false, no-save flag should be passed through to npm', function () {
+    it('when save is false, no-save flag should be passed through to npm', () => {
         const opts = { cwd: 'some/path', save: false };
         expect(npmArgs('platform', opts)).toContain('--no-save');
     });
