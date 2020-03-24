@@ -58,17 +58,17 @@ describe('npmArgs', function () {
     });
 
     it('when save_exact is true, save-exact flag should be passed through to npm', function () {
-        var opts = { cwd: 'some/path', save_exact: true };
+        const opts = { cwd: 'some/path', save_exact: true };
         expect(npmArgs('platform', opts)).toContain('--save-exact');
     });
 
     it('when save is true, save-dev flag should be passed through to npm', function () {
-        var opts = { cwd: 'some/path', save: true };
+        const opts = { cwd: 'some/path', save: true };
         expect(npmArgs('platform', opts)).toContain('--save-dev');
     });
 
     it('when save is false, no-save flag should be passed through to npm', function () {
-        var opts = { cwd: 'some/path', save: false };
+        const opts = { cwd: 'some/path', save: false };
         expect(npmArgs('platform', opts)).toContain('--no-save');
     });
 });

@@ -15,15 +15,15 @@
     under the License.
 */
 
-var fetch = require('..');
-var uninstall = fetch.uninstall;
+const fetch = require('..');
+const uninstall = fetch.uninstall;
 
-var path = require('path');
-var fs = require('fs-extra');
-var fileUrl = require('file-url');
-var helpers = require('./helpers.js');
+const path = require('path');
+const fs = require('fs-extra');
+const fileUrl = require('file-url');
+const helpers = require('./helpers.js');
 
-var tmpDir, opts;
+let tmpDir, opts;
 
 beforeEach(function () {
     opts = {};

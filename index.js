@@ -17,11 +17,11 @@
 
 const pify = require('pify');
 const which = pify(require('which'));
-var superspawn = require('cordova-common').superspawn;
-var events = require('cordova-common').events;
-var path = require('path');
-var fs = require('fs-extra');
-var CordovaError = require('cordova-common').CordovaError;
+const superspawn = require('cordova-common').superspawn;
+const events = require('cordova-common').events;
+const path = require('path');
+const fs = require('fs-extra');
+const CordovaError = require('cordova-common').CordovaError;
 const resolve = pify(require('resolve'), { multiArgs: true });
 const npa = require('npm-package-arg');
 const semver = require('semver');
@@ -153,7 +153,7 @@ module.exports.isNpmInstalled = isNpmInstalled;
  * @return {Promise<string>}    Resolves when removal has finished
  */
 module.exports.uninstall = function (target, dest, opts) {
-    var fetchArgs = ['uninstall'];
+    const fetchArgs = ['uninstall'];
     opts = opts || {};
 
     // check if npm is installed on the system
