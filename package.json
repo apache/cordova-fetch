@@ -37,8 +37,8 @@
     "rewire": "^4.0.1"
   },
   "scripts": {
-    "test": "npm run lint && npm run cover",
-    "cover": "nyc jasmine",
+    "test": "npm run lint && npm run test:coverage",
+    "test:coverage": "nyc jasmine",
     "lint": "eslint --ignore-path .gitignore ."
   },
   "engines": {
