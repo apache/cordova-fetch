@@ -17,11 +17,9 @@
 
 const pify = require('pify');
 const which = pify(require('which'));
-const superspawn = require('cordova-common').superspawn;
-const events = require('cordova-common').events;
 const path = require('path');
 const fs = require('fs-extra');
-const CordovaError = require('cordova-common').CordovaError;
+const { CordovaError, events, superspawn } = require('cordova-common');
 const resolve = pify(require('resolve'), { multiArgs: true });
 const npa = require('npm-package-arg');
 const semver = require('semver');
