@@ -15,53 +15,36 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: PR Checks
+name: Node CI
 
-on: pull_request
+on: [push, pull_request]
 
 jobs:
-  lint:
-    name: Code Linting
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Use Node.js 12
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-
-      - name: Environment Information
-        run: npm --version
-
-      - name: npm ci
-        run: npm ci
-
-      - name: npm run eslint
-        run: npm run eslint
-
   test:
-    name: NodeJS ${{ matrix.node_version }} on ${{ matrix.os }}
+    name: NodeJS ${{ matrix.node-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node_version: [10, 12]
+        node-version: [10.x, 12.x]
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node_version }}
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: ${{ matrix.node-version }}
 
       - name: Environment Information
-        run: npm --version
-
-      - name: npm cit
+        run: |
+          node --version
+          npm --version
+      - name: npm install and test
         run: npm cit
+        env:
+          CI: true
 
-      - name: Upload coverage report
-        run: npm install -g coveralls && npx nyc --reporter=text-lcov jasmine | coveralls
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
