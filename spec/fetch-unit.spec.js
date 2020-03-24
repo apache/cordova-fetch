@@ -93,7 +93,7 @@ describe('getTargetPackageSpecFromNpmInstallOutput', () => {
     it('should gracefully handle if could not determine the package name from output', () => {
         expect(() => {
             getTargetPackageSpecFromNpmInstallOutput(wrongOutputSample);
-        }).toThrow(new Error('Could not determine package name from output:\n' + wrongOutputSample));
+        }).toThrow(new Error(`Could not determine package name from output:\n${wrongOutputSample}`));
     });
 });
 

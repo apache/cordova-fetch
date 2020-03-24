@@ -84,7 +84,7 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
     const packageInfoLine = npmInstallOutput.split('\n')
         .find(line => line.startsWith('+ '));
     if (!packageInfoLine) {
-        throw new CordovaError('Could not determine package name from output:\n' + npmInstallOutput);
+        throw new CordovaError(`Could not determine package name from output:\n${npmInstallOutput}`);
     }
     return packageInfoLine.slice(2);
 }

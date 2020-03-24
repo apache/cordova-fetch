@@ -141,7 +141,7 @@ describe('fetching already installed packages', () => {
     }, 40000);
 
     it('should return package path if git repo name differs from plugin id', () => {
-        const TARGET = 'git+' + fileUrl(path.resolve(__dirname, 'support/repo-name-neq-plugin-id.git'));
+        const TARGET = `git+${fileUrl(path.resolve(__dirname, 'support/repo-name-neq-plugin-id.git'))}`;
         return Promise.resolve()
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }))
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }));
