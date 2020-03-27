@@ -19,9 +19,10 @@
 #
 -->
 
+[![Node CI](https://github.com/apache/cordova-fetch/workflows/Node%20CI/badge.svg?branch=master)](https://github.com/apache/cordova-fetch/actions?query=branch%3Amaster)
 [![NPM](https://nodei.co/npm/cordova-fetch.png)](https://nodei.co/npm/cordova-fetch/)
 
-# cordova-fetch [![Travis Badge]][Travis] [![AppVeyor Badge]][AppVeyor]
+# cordova-fetch
 
 This package can be used to install and uninstall Node.js packages using npm.
 
@@ -29,7 +30,16 @@ This package can be used to install and uninstall Node.js packages using npm.
 
 ### `fetch`
 
-Installs a module from npm, a git url or the local file system. Returns a `Promise` resolving to the absolute path to the installed package.
+Installs a module from:
+
+* `npm` registry
+* `git` url
+* `tarball`
+  * url
+  * file on local file system
+* `folder` path on local system
+
+Returns a `Promise` resolving to the absolute path of the installed package.
 
 ```js
 const fetch = require('cordova-fetch');
@@ -39,7 +49,7 @@ fetch(spec, dest, opts).then(pathToInstalledPackage => {
 });
 ```
 
-#### Parameters
+#### Fetch Parameters
 
 Parameter | Description
 -|-
@@ -47,7 +57,7 @@ Parameter | Description
 `dest` | Location where to install the package
 `opts` | Additional options (optional)
 
-##### Options
+##### Fetch Options
 
 Option | Default | Description
 -|-|-
@@ -55,7 +65,7 @@ Option | Default | Description
 
 ### `uninstall`
 
-Uninstalls a package from given directory. Returns a `Promise` that resolves when removal has finished
+Uninstalls a package from the given directory. Returns a resolved `Promise` when removal has finished.
 
 ```js
 const { uninstall } = require('cordova-fetch');
@@ -65,7 +75,7 @@ uninstall(packageName, dest, opts).then(() => {
 });
 ```
 
-#### Parameters
+#### Uninstall Parameters
 
 Parameter | Description
 -|-
@@ -73,15 +83,8 @@ Parameter | Description
 `dest` | Location from where to uninstall the package
 `opts` | An Object with additional options
 
-##### Options
+##### Uninstall Options
 
 Option | Default | Description
 -|-|-
-`save` | `false` | Removes dependency from `package.json` iff `true`
-
-
-[Travis Badge]: https://travis-ci.org/apache/cordova-fetch.svg?branch=master
-[Travis]: https://travis-ci.org/apache/cordova-fetch
-
-[AppVeyor Badge]: https://ci.appveyor.com/api/projects/status/6xv212nihtcnbsov?svg=true
-[AppVeyor]: https://ci.appveyor.com/project/ApacheSoftwareFoundation/cordova-fetch/branch/master
+`save` | `false` | Removes dependency from `package.json` if `true`
