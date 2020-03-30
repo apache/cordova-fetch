@@ -65,7 +65,7 @@ Option | Default | Description
 
 ### `uninstall`
 
-Uninstalls a package from the given directory. Returns a resolved `Promise` when removal has finished.
+Uninstalls a package from the given directory. Returns a `Promise` that resolves when removal has finished.
 
 ```js
 const { uninstall } = require('cordova-fetch');
@@ -87,4 +87,4 @@ Parameter | Description
 
 Option | Default | Description
 -|-|-
-`save` | `false` | Removes dependency from `package.json` if `true`
+`save` | `false` | Removes dependency from `package.json` iff `true`

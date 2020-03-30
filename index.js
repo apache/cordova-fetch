@@ -34,19 +34,21 @@ const semver = require('semver');
  *
  * @return {Promise<string>}    Absolute path to the installed package
  */
-module.exports = (target, dest, opts = {}) => Promise.resolve()
-    .then(() => {
-        if (!dest || !target) {
-            throw new CordovaError('Need to supply a target and destination');
-        }
-        // Create dest if it doesn't exist yet
-        fs.ensureDirSync(dest);
-    })
-    .then(_ => pathToInstalledPackage(target, dest))
-    .catch(_ => installPackage(target, dest, opts))
-    .catch(err => {
-        throw new CordovaError(err);
-    });
+module.exports = function (target, dest, opts = {}) {
+    return Promise.resolve()
+        .then(() => {
+            if (!dest || !target) {
+                throw new CordovaError('Need to supply a target and destination');
+            }
+            // Create dest if it doesn't exist yet
+            fs.ensureDirSync(dest);
+        })
+        .then(_ => pathToInstalledPackage(target, dest))
+        .catch(_ => installPackage(target, dest, opts))
+        .catch(err => {
+            throw new CordovaError(err);
+        });
+};
 
 // Installs the package specified by target and returns the installation path
 function installPackage (target, dest, opts) {
