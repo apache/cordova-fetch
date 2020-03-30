@@ -43,8 +43,10 @@ module.exports = function (target, dest, opts = {}) {
             // Create dest if it doesn't exist yet
             fs.ensureDirSync(dest);
         })
-        .then(_ => pathToInstalledPackage(target, dest))
-        .catch(_ => installPackage(target, dest, opts))
+        .then(_ => {
+            return pathToInstalledPackage(target, dest)
+                .catch(_ => installPackage(target, dest, opts));
+        })
         .catch(err => {
             throw new CordovaError(err);
         });
