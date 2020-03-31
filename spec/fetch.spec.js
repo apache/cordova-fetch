@@ -15,23 +15,23 @@
     under the License.
 */
 
-var fetch = require('..');
-var uninstall = fetch.uninstall;
+const fetch = require('..');
+const uninstall = fetch.uninstall;
 
-var path = require('path');
-var fs = require('fs-extra');
-var fileUrl = require('file-url');
-var helpers = require('./helpers.js');
+const path = require('path');
+const fs = require('fs-extra');
+const fileUrl = require('file-url');
+const helpers = require('./helpers.js');
 
-var tmpDir, opts;
+let tmpDir, opts;
 
-beforeEach(function () {
+beforeEach(() => {
     opts = {};
     tmpDir = helpers.tmpDir();
     process.chdir(tmpDir);
 });
 
-afterEach(function () {
+afterEach(() => {
     process.chdir(__dirname); // Needed to rm the dir on Windows.
     fs.removeSync(tmpDir);
 });
@@ -60,8 +60,8 @@ function expectDevDependenciesToBe (deps) {
     expect(rootPJ.devDependencies).toEqual(deps);
 }
 
-describe('fetch/uninstall tests via npm & git', function () {
-    it('should fetch and uninstall a cordova platform via npm & git', function () {
+describe('fetch/uninstall tests via npm & git', () => {
+    it('should fetch and uninstall a cordova platform via npm & git', () => {
         return Promise.resolve()
             .then(_ => fetchAndMatch('cordova-android'))
             .then(_ => uninstall('cordova-android', tmpDir, opts))
@@ -72,19 +72,19 @@ describe('fetch/uninstall tests via npm & git', function () {
             .then(_ => expectNotToBeInstalled('cordova-browser'));
     }, 60000);
 
-    it('should fetch a scoped plugin from npm', function () {
+    it('should fetch a scoped plugin from npm', () => {
         return fetchAndMatch('@stevegill/cordova-plugin-device');
     }, 30000);
 });
 
-describe('fetch/uninstall with --save', function () {
-    beforeEach(function () {
+describe('fetch/uninstall with --save', () => {
+    beforeEach(() => {
         opts = { save: true };
         // copy package.json from spec directory to tmpDir
         fs.copySync(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
-    it('should fetch and uninstall a cordova platform via npm & git tags/branches', function () {
+    it('should fetch and uninstall a cordova platform via npm & git tags/branches', () => {
         return Promise.resolve()
             // npm tag
             .then(_ => fetchAndMatch('cordova-android@8.1.0', {
@@ -115,7 +115,7 @@ describe('fetch/uninstall with --save', function () {
             .then(_ => uninstall('cordova-android', tmpDir, opts));
     }, 150000);
 
-    it('should fetch and uninstall a cordova plugin via git commit sha', function () {
+    it('should fetch and uninstall a cordova plugin via git commit sha', () => {
         const URL = 'https://github.com/apache/cordova-plugin-contacts.git#7db612115755c2be73a98dda76ff4c5fd9d8a575';
         return Promise.resolve()
             .then(_ => fetchAndMatch(URL, {
@@ -129,32 +129,32 @@ describe('fetch/uninstall with --save', function () {
     }, 30000);
 });
 
-describe('fetching already installed packages', function () {
-    beforeEach(function () {
+describe('fetching already installed packages', () => {
+    beforeEach(() => {
         fs.copySync(path.join(__dirname, 'support'), 'support');
     });
 
-    it('should return package path for registry packages', function () {
+    it('should return package path for registry packages', () => {
         return Promise.resolve()
             .then(_ => fetchAndMatch('cordova-plugin-device'))
             .then(_ => fetchAndMatch('cordova-plugin-device'));
     }, 40000);
 
-    it('should return package path if git repo name differs from plugin id', function () {
-        const TARGET = 'git+' + fileUrl(path.resolve(__dirname, 'support/repo-name-neq-plugin-id.git'));
+    it('should return package path if git repo name differs from plugin id', () => {
+        const TARGET = `git+${fileUrl(path.resolve(__dirname, 'support/repo-name-neq-plugin-id.git'))}`;
         return Promise.resolve()
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }))
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }));
     }, 40000);
 
-    it('should return package path if using a relative path', function () {
+    it('should return package path if using a relative path', () => {
         const TARGET = 'file:support/dummy-local-plugin';
         return Promise.resolve()
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }))
             .then(_ => fetchAndMatch(TARGET, { name: 'test-plugin' }));
     }, 60000);
 
-    it('should return package path for git+http variants', function () {
+    it('should return package path for git+http variants', () => {
         return Promise.resolve()
             .then(_ => fetchAndMatch('github:apache/cordova-plugin-device', { name: 'cordova-plugin-device' }))
             .then(_ => fetchAndMatch('https://github.com/apache/cordova-plugin-device', { name: 'cordova-plugin-device' }))
@@ -162,22 +162,22 @@ describe('fetching already installed packages', function () {
     }, 60000);
 });
 
-describe('negative tests', function () {
-    it('should fail fetching a module that does not exist on npm', function () {
+describe('negative tests', () => {
+    it('should fail fetching a module that does not exist on npm', () => {
         return fetch('NOTAMODULE', tmpDir, opts)
-            .then(function (result) {
+            .then(result => {
                 fail('Expected promise to be rejected');
-            }, function (err) {
+            }, err => {
                 expect(err.message.code).toBe(1);
                 expect(err).toBeDefined();
             });
     }, 30000);
 
-    it('should fail fetching a giturl which contains a subdirectory', function () {
+    it('should fail fetching a giturl which contains a subdirectory', () => {
         return fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
-            .then(function (result) {
+            .then(result => {
                 fail('Expected promise to be rejected');
-            }, function (err) {
+            }, err => {
                 expect(err.message.code).toBe(1);
                 expect(err).toBeDefined();
             });
@@ -201,7 +201,7 @@ describe('fetching with node_modules in ancestor dirs', () => {
         fetchTarget = fileUrl(path.resolve('support/dummy-local-plugin'));
     });
 
-    it('should still install to given destination', function () {
+    it('should still install to given destination', () => {
         const expectedInstallPath = path.join(fetchDestination, 'node_modules/test-plugin');
 
         return fetch(fetchTarget, fetchDestination).then(pkgInstallPath => {

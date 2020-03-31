@@ -17,11 +17,9 @@
  under the License.
  */
 
-var path = require('path');
-var fs = require('fs-extra');
-var os = require('os');
+const path = require('path');
+const fs = require('fs-extra');
+const os = require('os');
 
 const tmpDirTemplate = path.join(os.tmpdir(), 'cordova-fetch-tests-');
-module.exports.tmpDir = function () {
-    return fs.mkdtempSync(tmpDirTemplate);
-};
+module.exports.tmpDir = () => fs.mkdtempSync(tmpDirTemplate);

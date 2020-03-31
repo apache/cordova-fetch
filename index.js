@@ -17,11 +17,9 @@
 
 const pify = require('pify');
 const which = pify(require('which'));
-var superspawn = require('cordova-common').superspawn;
-var events = require('cordova-common').events;
-var path = require('path');
-var fs = require('fs-extra');
-var CordovaError = require('cordova-common').CordovaError;
+const path = require('path');
+const fs = require('fs-extra');
+const { CordovaError, events, superspawn } = require('cordova-common');
 const resolve = pify(require('resolve'), { multiArgs: true });
 const npa = require('npm-package-arg');
 const semver = require('semver');
@@ -38,7 +36,7 @@ const semver = require('semver');
  */
 module.exports = function (target, dest, opts = {}) {
     return Promise.resolve()
-        .then(function () {
+        .then(() => {
             if (!dest || !target) {
                 throw new CordovaError('Need to supply a target and destination');
             }
@@ -49,7 +47,7 @@ module.exports = function (target, dest, opts = {}) {
             return pathToInstalledPackage(target, dest)
                 .catch(_ => installPackage(target, dest, opts));
         })
-        .catch(function (err) {
+        .catch(err => {
             throw new CordovaError(err);
         });
 };
@@ -90,7 +88,7 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
     const packageInfoLine = npmInstallOutput.split('\n')
         .find(line => line.startsWith('+ '));
     if (!packageInfoLine) {
-        throw new CordovaError('Could not determine package name from output:\n' + npmInstallOutput);
+        throw new CordovaError(`Could not determine package name from output:\n${npmInstallOutput}`);
     }
     return packageInfoLine.slice(2);
 }
@@ -152,13 +150,13 @@ module.exports.isNpmInstalled = isNpmInstalled;
  *
  * @return {Promise<string>}    Resolves when removal has finished
  */
-module.exports.uninstall = function (target, dest, opts) {
-    var fetchArgs = ['uninstall'];
+module.exports.uninstall = (target, dest, opts) => {
+    const fetchArgs = ['uninstall'];
     opts = opts || {};
 
     // check if npm is installed on the system
     return isNpmInstalled()
-        .then(function () {
+        .then(() => {
             if (dest && target) {
                 // add target to fetchArgs Array
                 fetchArgs.push(target);
@@ -178,7 +176,7 @@ module.exports.uninstall = function (target, dest, opts) {
             // from package.json if --save was used.
             return superspawn.spawn('npm', fetchArgs, opts);
         })
-        .catch(function (err) {
+        .catch(err => {
             throw new CordovaError(err);
         });
 };
