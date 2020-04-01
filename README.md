@@ -19,10 +19,11 @@
 #
 -->
 
-[![Node CI](https://github.com/apache/cordova-fetch/workflows/Node%20CI/badge.svg?branch=master)](https://github.com/apache/cordova-fetch/actions?query=branch%3Amaster)
+# cordova-fetch
+
 [![NPM](https://nodei.co/npm/cordova-fetch.png)](https://nodei.co/npm/cordova-fetch/)
 
-# cordova-fetch
+[![Node CI](https://github.com/apache/cordova-fetch/workflows/Node%20CI/badge.svg?branch=master)](https://github.com/apache/cordova-fetch/actions?query=branch%3Amaster)
 
 This package can be used to install and uninstall Node.js packages using npm.
 
