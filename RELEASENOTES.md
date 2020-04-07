@@ -20,6 +20,50 @@
 -->
 # Cordova-fetch Release Notes
 
+### 3.0.0 (Apr 07, 2020)
+
+* [GH-84](https://github.com/apache/cordova-fetch/pull/84) doc(README): fix markdown lint warning
+* [GH-82](https://github.com/apache/cordova-fetch/pull/82) refactor: modernize code & update `README`
+  * refactor: transform `var` to `let` & `const`
+  * refactor: consolidate `cordova-common` vars
+  * refactor: transform arrow functions & arrow returns
+  * refactor: transform template strings
+  * doc(README): update & formatting
+  * chore(npm): update package repo & bugs url
+  * chore: apply suggestions
+  * chore: revert promise chain flattening
+* [GH-83](https://github.com/apache/cordova-fetch/pull/83) breaking(npm): bump dependencies
+  * `@cordova/eslint-config@^3.0.0`
+  * `nyc@^15.0.0`
+  * `rewire@^5.0.0`
+  * `cordova-common@^3.2.1`
+  * `fs-extra@^9.0.0`
+  * `npm-package-arg@^8.0.1`
+  * `pify@^5.0.0`
+  * `resolve@^1.15.1`
+  * `semver@^7.1.3`
+  * `which@^2.0.2`
+  * `cordova-common@4.0.0`
+* [GH-79](https://github.com/apache/cordova-fetch/pull/79) feat: update package & ci services
+  * ci: replace current services with gh-actions
+  * ci(gh-action): update workflow
+  * chore(package-lock): rebuild
+  * chore(npm): drop appveyor from ignore list
+  * chore(npm-script): rename cover to test:coverage
+* [GH-81](https://github.com/apache/cordova-fetch/pull/81) chore: consolidate eslint configs
+* [GH-70](https://github.com/apache/cordova-fetch/pull/70) refactor: eslint setup
+* Save platforms and plugins to devDependencies
+* [GH-72](https://github.com/apache/cordova-fetch/pull/72) chore: update `file-url` dependency to `^3.0.0`
+* [GH-80](https://github.com/apache/cordova-fetch/pull/80) Drop code supporting `npm@<5`
+* [GH-74](https://github.com/apache/cordova-fetch/pull/74) chore: improve npm ignore list
+* [GH-73](https://github.com/apache/cordova-fetch/pull/73) chore: bump production dependencies
+* [GH-71](https://github.com/apache/cordova-fetch/pull/71) chore: update `jasmine` dependencies
+* [GH-69](https://github.com/apache/cordova-fetch/pull/69) chore: drop node 6 and 8 support
+* [GH-68](https://github.com/apache/cordova-fetch/pull/68) chore: bump version to 3.0.0-dev
+* [GH-78](https://github.com/apache/cordova-fetch/pull/78) Work around npm bug when uninstalling old cordova platforms
+* [GH-77](https://github.com/apache/cordova-fetch/pull/77) chore: update `nyc` dev dependency
+* [GH-63](https://github.com/apache/cordova-fetch/pull/63) Add Node.js 12 to CI Services
+
 ### 2.0.1 (Mar 18, 2019)
 
 * [GH-61](https://github.com/apache/cordova-fetch/pull/61) Prepare Fetch 2.0.1 Patch Release
