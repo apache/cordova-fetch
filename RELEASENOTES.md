@@ -22,6 +22,7 @@
 
 ### 3.0.0 (Apr 07, 2020)
 
+* Added NOTICE & LICENSE file for release
 * [GH-84](https://github.com/apache/cordova-fetch/pull/84) doc(README): fix markdown lint warning
 * [GH-82](https://github.com/apache/cordova-fetch/pull/82) refactor: modernize code & update `README`
   * refactor: transform `var` to `let` & `const`
