@@ -99,20 +99,18 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
 
 // Resolves to installation path of package defined by spec if the right version
 // is installed, rejects otherwise.
-function pathToInstalledPackage (spec, dest) {
-    return Promise.resolve().then(_ => {
-        const { name, rawSpec } = npa(spec, dest);
-        if (!name) {
-            throw new CordovaError(`Cannot determine package name from spec ${spec}`);
-        }
-        return resolvePathToPackage(name, dest)
-            .then(([pkgPath, { version }]) => {
-                if (!semver.satisfies(version, rawSpec)) {
-                    throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
-                }
-                return pkgPath;
-            });
-    });
+async function pathToInstalledPackage (spec, dest) {
+    const { name, rawSpec } = npa(spec, dest);
+    if (!name) {
+        throw new CordovaError(`Cannot determine package name from spec ${spec}`);
+    }
+
+    const [pkgPath, { version }] = await resolvePathToPackage(name, dest);
+    if (!semver.satisfies(version, rawSpec)) {
+        throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
+    }
+
+    return pkgPath;
 }
 
 // Resolves to installation path and package.json of package `name` starting
