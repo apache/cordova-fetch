@@ -121,7 +121,7 @@ function resolvePathToPackage (name, basedir) {
 
         // We resolve the path to the module's package.json to avoid getting the
         // path to `main` which could be located anywhere in the package
-        return resolve(path.join(name, 'package.json'), { paths, basedir })
+        return resolve(`${name}/package.json`, { paths, basedir })
             .then(([pkgJsonPath, pkgJson]) => [
                 path.dirname(pkgJsonPath), pkgJson
             ]);
