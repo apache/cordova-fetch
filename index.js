@@ -58,21 +58,20 @@ module.exports = async function (target, dest, opts = {}) {
 };
 
 // Installs the package specified by target and returns the installation path
-function installPackage (target, dest, opts) {
-    return isNpmInstalled()
-        // Ensure that `npm` installs to `dest` and not any of its ancestors
-        .then(_ => fs.ensureDir(path.join(dest, 'node_modules')))
+async function installPackage (target, dest, opts) {
+    await isNpmInstalled();
 
-        // Run `npm` to install requested package
-        .then(_ => npmArgs(target, opts))
-        .then(args => {
-            events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
-            return superspawn.spawn('npm', args, { cwd: dest });
-        })
+    // Ensure that `npm` installs to `dest` and not any of its ancestors
+    await fs.ensureDir(path.join(dest, 'node_modules'));
 
-        // Resolve path to installed package
-        .then(getTargetPackageSpecFromNpmInstallOutput)
-        .then(spec => pathToInstalledPackage(spec, dest));
+    // Run `npm` to install requested package
+    const args = npmArgs(target, opts);
+    events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
+    const npmInstallOutput = await superspawn.spawn('npm', args, { cwd: dest });
+
+    // Resolve path to installed package
+    const spec = await getTargetPackageSpecFromNpmInstallOutput(npmInstallOutput);
+    return pathToInstalledPackage(spec, dest);
 }
 
 function npmArgs (target, opts) {
