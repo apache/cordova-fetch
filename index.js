@@ -132,7 +132,7 @@ async function resolvePathToPackage (name, basedir) {
  *
  * @return {Promise<string>} Absolute path to npm.
  */
-function isNpmInstalled () {
+async function isNpmInstalled () {
     return which('npm').catch(_ => {
         throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
     });
@@ -149,33 +149,33 @@ module.exports.isNpmInstalled = isNpmInstalled;
  *
  * @return {Promise<string>}    Resolves when removal has finished
  */
-module.exports.uninstall = (target, dest, opts) => {
+module.exports.uninstall = async (target, dest, opts) => {
     const fetchArgs = ['uninstall'];
     opts = opts || {};
 
-    // check if npm is installed on the system
-    return isNpmInstalled()
-        .then(() => {
-            if (dest && target) {
-                // add target to fetchArgs Array
-                fetchArgs.push(target);
-            } else throw new CordovaError('Need to supply a target and destination');
+    try {
+        // check if npm is installed on the system
+        await isNpmInstalled();
 
-            // set the directory where npm uninstall will be run
-            opts.cwd = dest;
+        if (dest && target) {
+            // add target to fetchArgs Array
+            fetchArgs.push(target);
+        } else throw new CordovaError('Need to supply a target and destination');
 
-            // if user added --save flag, pass --save-dev flag to npm uninstall command
-            if (opts.save) {
-                fetchArgs.push('--save-dev');
-            } else {
-                fetchArgs.push('--no-save');
-            }
+        // set the directory where npm uninstall will be run
+        opts.cwd = dest;
 
-            // run npm uninstall, this will remove dependency
-            // from package.json if --save was used.
-            return superspawn.spawn('npm', fetchArgs, opts);
-        })
-        .catch(err => {
-            throw new CordovaError(err);
-        });
+        // if user added --save flag, pass --save-dev flag to npm uninstall command
+        if (opts.save) {
+            fetchArgs.push('--save-dev');
+        } else {
+            fetchArgs.push('--no-save');
+        }
+
+        // run npm uninstall, this will remove dependency
+        // from package.json if --save was used.
+        return superspawn.spawn('npm', fetchArgs, opts);
+    } catch (err) {
+        throw new CordovaError(err);
+    }
 };
