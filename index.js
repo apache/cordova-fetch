@@ -20,9 +20,13 @@ const which = pify(require('which'));
 const path = require('path');
 const fs = require('fs-extra');
 const { CordovaError, events, superspawn } = require('cordova-common');
-const resolve = pify(require('resolve'), { multiArgs: true });
 const npa = require('npm-package-arg');
 const semver = require('semver');
+
+// pify's multiArgs unfortunately causes resolve to wrap errors in an Array.
+// Thus we wrap the function again to unpack the errors from the rejec
+const rslv = pify(require('resolve'), { multiArgs: true });
+const resolve = (...args) => rslv(...args).catch(([err]) => { throw err; });
 
 /**
  * Installs a module from npm, a git url or the local file system.
