@@ -24,7 +24,7 @@ const npa = require('npm-package-arg');
 const semver = require('semver');
 
 // pify's multiArgs unfortunately causes resolve to wrap errors in an Array.
-// Thus we wrap the function again to unpack the errors from the rejec
+// Thus we wrap the function again to unpack these wrapped errors.
 const rslv = pify(require('resolve'), { multiArgs: true });
 const resolve = (...args) => rslv(...args).catch(([err]) => { throw err; });
 
