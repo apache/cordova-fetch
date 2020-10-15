@@ -115,19 +115,16 @@ async function pathToInstalledPackage (spec, dest) {
 
 // Resolves to installation path and package.json of package `name` starting
 // from `basedir`
-function resolvePathToPackage (name, basedir) {
-    return Promise.resolve().then(_ => {
-        const paths = (process.env.NODE_PATH || '')
-            .split(path.delimiter)
-            .filter(p => p);
+async function resolvePathToPackage (name, basedir) {
+    const paths = (process.env.NODE_PATH || '')
+        .split(path.delimiter)
+        .filter(p => p);
 
-        // We resolve the path to the module's package.json to avoid getting the
-        // path to `main` which could be located anywhere in the package
-        return resolve(`${name}/package.json`, { paths, basedir })
-            .then(([pkgJsonPath, pkgJson]) => [
-                path.dirname(pkgJsonPath), pkgJson
-            ]);
-    });
+    // We resolve the path to the module's package.json to avoid getting the
+    // path to `main` which could be located anywhere in the package
+    const [pkgJsonPath, pkgJson] = await resolve(`${name}/package.json`, { paths, basedir });
+
+    return [path.dirname(pkgJsonPath), pkgJson];
 }
 
 /**
