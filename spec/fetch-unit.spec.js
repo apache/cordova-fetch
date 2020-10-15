@@ -20,35 +20,6 @@ const path = require('path');
 const rewire = require('rewire');
 const { tmpDir: getTmpDir } = require('./helpers.js');
 
-describe('fetch', () => {
-    let fetch, installPackage;
-
-    beforeEach(() => {
-        fetch = rewire('..');
-        installPackage = jasmine.createSpy()
-            .and.returnValue(Promise.resolve('/foo'));
-        fetch.__set__({ fs: { ensureDirSync: _ => _ }, installPackage });
-    });
-
-    it('should return path to installed package', () => {
-        fetch.__set__({ pathToInstalledPackage: _ => Promise.resolve('/foo') });
-
-        return fetch('foo', 'bar').then(result => {
-            expect(result).toBe('/foo');
-            expect(installPackage).not.toHaveBeenCalled();
-        });
-    });
-
-    it('should install package if not found', () => {
-        fetch.__set__({ pathToInstalledPackage: _ => Promise.reject(new Error()) });
-
-        return fetch('foo', 'bar').then(result => {
-            expect(result).toBe('/foo');
-            expect(installPackage).toHaveBeenCalled();
-        });
-    });
-});
-
 describe('npmArgs', () => {
     const fetch = rewire('..');
     const npmArgs = fetch.__get__('npmArgs');
@@ -70,30 +41,6 @@ describe('npmArgs', () => {
     it('when save is false, no-save flag should be passed through to npm', () => {
         const opts = { cwd: 'some/path', save: false };
         expect(npmArgs('platform', opts)).toContain('--no-save');
-    });
-});
-
-describe('getTargetPackageSpecFromNpmInstallOutput', () => {
-    const fetch = rewire('..');
-    const getTargetPackageSpecFromNpmInstallOutput = fetch.__get__('getTargetPackageSpecFromNpmInstallOutput');
-    const outputSampleNpm5 = '+ cordova-electron@1.0.0-dev';
-    const outputSampleNpm5WithPostinstall = '> electron@3.1.1 postinstall /cordova-project/node_modules/electron\n' +
-                                            '> node install.js\n\n' +
-                                            '+ cordova-electron@1.0.0-dev\n';
-    const wrongOutputSample = 'Wrong output';
-
-    it('should parse the package name using  npm >= 5', () => {
-        expect(getTargetPackageSpecFromNpmInstallOutput(outputSampleNpm5)).toEqual('cordova-electron@1.0.0-dev');
-    });
-
-    it('should parse the package name using npm >= 5 with postinstall ', () => {
-        expect(getTargetPackageSpecFromNpmInstallOutput(outputSampleNpm5WithPostinstall)).toEqual('cordova-electron@1.0.0-dev');
-    });
-
-    it('should gracefully handle if could not determine the package name from output', () => {
-        expect(() => {
-            getTargetPackageSpecFromNpmInstallOutput(wrongOutputSample);
-        }).toThrow(new Error(`Could not determine package name from output:\n${wrongOutputSample}`));
     });
 });
 

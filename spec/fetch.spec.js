@@ -164,23 +164,15 @@ describe('fetching already installed packages', () => {
 
 describe('negative tests', () => {
     it('should fail fetching a module that does not exist on npm', () => {
-        return fetch('NOTAMODULE', tmpDir, opts)
-            .then(result => {
-                fail('Expected promise to be rejected');
-            }, err => {
-                expect(err.message.code).toBe(1);
-                expect(err).toBeDefined();
-            });
+        return expectAsync(
+            fetch('NOTAMODULE', tmpDir, opts)
+        ).toBeRejectedWithError();
     }, 30000);
 
     it('should fail fetching a giturl which contains a subdirectory', () => {
-        return fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
-            .then(result => {
-                fail('Expected promise to be rejected');
-            }, err => {
-                expect(err.message.code).toBe(1);
-                expect(err).toBeDefined();
-            });
+        return expectAsync(
+            fetch('https://github.com/apache/cordova-plugins.git#:keyboard', tmpDir, opts)
+        ).toBeRejectedWithError();
     }, 30000);
 });
 

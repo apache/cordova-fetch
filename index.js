@@ -21,6 +21,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const { CordovaError, events, superspawn } = require('cordova-common');
 const npa = require('npm-package-arg');
+const pacote = require('pacote');
 const semver = require('semver');
 
 // pify's multiArgs unfortunately causes resolve to wrap errors in an Array.
@@ -47,11 +48,27 @@ module.exports = async function (target, dest, opts = {}) {
         // Create dest if it doesn't exist yet
         fs.ensureDirSync(dest);
 
-        try {
-            return await pathToInstalledPackage(target, dest);
-        } catch {
-            return await installPackage(target, dest, opts);
+        // First try to determine the name from the spec using npa. This is very cheap.
+        let { name, rawSpec } = npa(target, dest);
+
+        if (!name) {
+            // If that fails, get out the big guns and fetch a full manifest using pacote.
+            ({ name } = await pacote.manifest(target, { where: dest }));
+        } else if (semver.validRange(rawSpec)) {
+            // If the provided spec is a name and a version range, we look for
+            // an installed package that satisfies the requested version range
+            try {
+                const [pkgPath, { version }] = await resolvePathToPackage(name, dest);
+                if (semver.satisfies(version, rawSpec)) return pkgPath;
+            } catch (err) {
+                // Ignore MODULE_NOT_FOUND errors from resolvePathToPackage
+                if (err.code !== 'MODULE_NOT_FOUND') throw err;
+            }
         }
+
+        await installPackage(target, dest, opts);
+
+        return (await resolvePathToPackage(name, dest))[0];
     } catch (err) {
         throw new CordovaError(err);
     }
@@ -67,11 +84,7 @@ async function installPackage (target, dest, opts) {
     // Run `npm` to install requested package
     const args = npmArgs(target, opts);
     events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
-    const npmInstallOutput = await superspawn.spawn('npm', args, { cwd: dest });
-
-    // Resolve path to installed package
-    const spec = await getTargetPackageSpecFromNpmInstallOutput(npmInstallOutput);
-    return pathToInstalledPackage(spec, dest);
+    await superspawn.spawn('npm', args, { cwd: dest });
 }
 
 function npmArgs (target, opts) {
@@ -86,31 +99,6 @@ function npmArgs (target, opts) {
         args.push('--no-save');
     }
     return args;
-}
-
-function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
-    const packageInfoLine = npmInstallOutput.split('\n')
-        .find(line => line.startsWith('+ '));
-    if (!packageInfoLine) {
-        throw new CordovaError(`Could not determine package name from output:\n${npmInstallOutput}`);
-    }
-    return packageInfoLine.slice(2);
-}
-
-// Resolves to installation path of package defined by spec if the right version
-// is installed, rejects otherwise.
-async function pathToInstalledPackage (spec, dest) {
-    const { name, rawSpec } = npa(spec, dest);
-    if (!name) {
-        throw new CordovaError(`Cannot determine package name from spec ${spec}`);
-    }
-
-    const [pkgPath, { version }] = await resolvePathToPackage(name, dest);
-    if (!semver.satisfies(version, rawSpec)) {
-        throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
-    }
-
-    return pkgPath;
 }
 
 // Resolves to installation path and package.json of package `name` starting
