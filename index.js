@@ -38,40 +38,40 @@ const resolve = (...args) => rslv(...args).catch(([err]) => { throw err; });
  *
  * @return {Promise<string>}    Absolute path to the installed package
  */
-module.exports = function (target, dest, opts = {}) {
-    return Promise.resolve()
-        .then(() => {
-            if (!dest || !target) {
-                throw new CordovaError('Need to supply a target and destination');
-            }
-            // Create dest if it doesn't exist yet
-            fs.ensureDirSync(dest);
-        })
-        .then(_ => {
-            return pathToInstalledPackage(target, dest)
-                .catch(_ => installPackage(target, dest, opts));
-        })
-        .catch(err => {
-            throw new CordovaError(err);
-        });
+module.exports = async function (target, dest, opts = {}) {
+    try {
+        if (!dest || !target) {
+            throw new CordovaError('Need to supply a target and destination');
+        }
+
+        // Create dest if it doesn't exist yet
+        fs.ensureDirSync(dest);
+
+        try {
+            return await pathToInstalledPackage(target, dest);
+        } catch {
+            return await installPackage(target, dest, opts);
+        }
+    } catch (err) {
+        throw new CordovaError(err);
+    }
 };
 
 // Installs the package specified by target and returns the installation path
-function installPackage (target, dest, opts) {
-    return isNpmInstalled()
-        // Ensure that `npm` installs to `dest` and not any of its ancestors
-        .then(_ => fs.ensureDir(path.join(dest, 'node_modules')))
+async function installPackage (target, dest, opts) {
+    await isNpmInstalled();
 
-        // Run `npm` to install requested package
-        .then(_ => npmArgs(target, opts))
-        .then(args => {
-            events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
-            return superspawn.spawn('npm', args, { cwd: dest });
-        })
+    // Ensure that `npm` installs to `dest` and not any of its ancestors
+    await fs.ensureDir(path.join(dest, 'node_modules'));
 
-        // Resolve path to installed package
-        .then(getTargetPackageSpecFromNpmInstallOutput)
-        .then(spec => pathToInstalledPackage(spec, dest));
+    // Run `npm` to install requested package
+    const args = npmArgs(target, opts);
+    events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
+    const npmInstallOutput = await superspawn.spawn('npm', args, { cwd: dest });
+
+    // Resolve path to installed package
+    const spec = await getTargetPackageSpecFromNpmInstallOutput(npmInstallOutput);
+    return pathToInstalledPackage(spec, dest);
 }
 
 function npmArgs (target, opts) {
@@ -99,37 +99,32 @@ function getTargetPackageSpecFromNpmInstallOutput (npmInstallOutput) {
 
 // Resolves to installation path of package defined by spec if the right version
 // is installed, rejects otherwise.
-function pathToInstalledPackage (spec, dest) {
-    return Promise.resolve().then(_ => {
-        const { name, rawSpec } = npa(spec, dest);
-        if (!name) {
-            throw new CordovaError(`Cannot determine package name from spec ${spec}`);
-        }
-        return resolvePathToPackage(name, dest)
-            .then(([pkgPath, { version }]) => {
-                if (!semver.satisfies(version, rawSpec)) {
-                    throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
-                }
-                return pkgPath;
-            });
-    });
+async function pathToInstalledPackage (spec, dest) {
+    const { name, rawSpec } = npa(spec, dest);
+    if (!name) {
+        throw new CordovaError(`Cannot determine package name from spec ${spec}`);
+    }
+
+    const [pkgPath, { version }] = await resolvePathToPackage(name, dest);
+    if (!semver.satisfies(version, rawSpec)) {
+        throw new CordovaError(`Installed package ${name}@${version} does not satisfy ${name}@${rawSpec}`);
+    }
+
+    return pkgPath;
 }
 
 // Resolves to installation path and package.json of package `name` starting
 // from `basedir`
-function resolvePathToPackage (name, basedir) {
-    return Promise.resolve().then(_ => {
-        const paths = (process.env.NODE_PATH || '')
-            .split(path.delimiter)
-            .filter(p => p);
+async function resolvePathToPackage (name, basedir) {
+    const paths = (process.env.NODE_PATH || '')
+        .split(path.delimiter)
+        .filter(p => p);
 
-        // We resolve the path to the module's package.json to avoid getting the
-        // path to `main` which could be located anywhere in the package
-        return resolve(`${name}/package.json`, { paths, basedir })
-            .then(([pkgJsonPath, pkgJson]) => [
-                path.dirname(pkgJsonPath), pkgJson
-            ]);
-    });
+    // We resolve the path to the module's package.json to avoid getting the
+    // path to `main` which could be located anywhere in the package
+    const [pkgJsonPath, pkgJson] = await resolve(`${name}/package.json`, { paths, basedir });
+
+    return [path.dirname(pkgJsonPath), pkgJson];
 }
 
 /**
@@ -137,7 +132,7 @@ function resolvePathToPackage (name, basedir) {
  *
  * @return {Promise<string>} Absolute path to npm.
  */
-function isNpmInstalled () {
+async function isNpmInstalled () {
     return which('npm').catch(_ => {
         throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
     });
@@ -154,33 +149,33 @@ module.exports.isNpmInstalled = isNpmInstalled;
  *
  * @return {Promise<string>}    Resolves when removal has finished
  */
-module.exports.uninstall = (target, dest, opts) => {
+module.exports.uninstall = async (target, dest, opts) => {
     const fetchArgs = ['uninstall'];
     opts = opts || {};
 
-    // check if npm is installed on the system
-    return isNpmInstalled()
-        .then(() => {
-            if (dest && target) {
-                // add target to fetchArgs Array
-                fetchArgs.push(target);
-            } else throw new CordovaError('Need to supply a target and destination');
+    try {
+        // check if npm is installed on the system
+        await isNpmInstalled();
 
-            // set the directory where npm uninstall will be run
-            opts.cwd = dest;
+        if (dest && target) {
+            // add target to fetchArgs Array
+            fetchArgs.push(target);
+        } else throw new CordovaError('Need to supply a target and destination');
 
-            // if user added --save flag, pass --save-dev flag to npm uninstall command
-            if (opts.save) {
-                fetchArgs.push('--save-dev');
-            } else {
-                fetchArgs.push('--no-save');
-            }
+        // set the directory where npm uninstall will be run
+        opts.cwd = dest;
 
-            // run npm uninstall, this will remove dependency
-            // from package.json if --save was used.
-            return superspawn.spawn('npm', fetchArgs, opts);
-        })
-        .catch(err => {
-            throw new CordovaError(err);
-        });
+        // if user added --save flag, pass --save-dev flag to npm uninstall command
+        if (opts.save) {
+            fetchArgs.push('--save-dev');
+        } else {
+            fetchArgs.push('--no-save');
+        }
+
+        // run npm uninstall, this will remove dependency
+        // from package.json if --save was used.
+        return superspawn.spawn('npm', fetchArgs, opts);
+    } catch (err) {
+        throw new CordovaError(err);
+    }
 };
