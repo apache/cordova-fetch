@@ -20,6 +20,14 @@
 -->
 # Cordova-fetch Release Notes
 
+### 3.0.1 (Feb 02, 2021)
+
+* [GH-91](https://github.com/apache/cordova-fetch/pull/91) fix: cordova-fetch with npm@7
+* [GH-89](https://github.com/apache/cordova-fetch/pull/89) refactor: use async/await where applicable
+* [GH-88](https://github.com/apache/cordova-fetch/pull/88) fix: do not pack rejections from resolve in array
+* [GH-90](https://github.com/apache/cordova-fetch/pull/90) fix: use POSIX-style paths for require.resolve & Co
+* [GH-86](https://github.com/apache/cordova-fetch/pull/86) ci: add node 14 to workflow
+
 ### 3.0.0 (Apr 07, 2020)
 
 * Added NOTICE & LICENSE file for release
