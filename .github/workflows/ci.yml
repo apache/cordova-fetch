@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x, 15.x]
+        node-version: [10.x, 12.x, 14.x, 16.x]
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
@@ -35,10 +35,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Update to npm@^7.2 on Node 15
-        if: matrix.node-version == '15.x'
-        run: npm i -g npm@^7.2
 
       - name: Environment Information
         run: |
