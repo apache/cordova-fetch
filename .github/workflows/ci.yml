@@ -41,6 +41,10 @@ jobs:
           node --version
           npm --version
 
+      - name: Update to npm@^7.2 on Node 14
+        if: matrix.node-version == '14.x'
+        run: npm i -g npm@^7.2
+
       - name: npm install and test
         run: npm cit
         env:
