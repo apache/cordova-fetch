@@ -20,6 +20,23 @@
 -->
 # Cordova-fetch Release Notes
 
+### 3.1.0 (Dec 06, 2022)
+
+* [GH-101](https://github.com/apache/cordova-fetch/pull/101) ci(workflow): update node 14 to use npm ^7.2
+* [GH-100](https://github.com/apache/cordova-fetch/pull/100) ci(workflow): update action dependencies & node versions
+* [GH-98](https://github.com/apache/cordova-fetch/pull/98) dep(npm): bump w/ latetst minor & patch releases
+  * `cordova-common@^4.1.0`
+  * `fs-extra@^9.1.0`
+  * `npm-package-arg@^8.1.5`
+  * `pacote@^11.3.5`
+  * `resolve@^1.22.1`
+  * `semver@^7.3.8`
+  * `jasmine@^3.99.0`
+  * `nyc@^15.1.0`
+* [GH-97](https://github.com/apache/cordova-fetch/pull/97) chore(npm): rebuilt `package-lock` to v2
+* [GH-94](https://github.com/apache/cordova-fetch/pull/94) ci(workflow): replace node 15 with node 16 (npm@7)
+* [GH-93](https://github.com/apache/cordova-fetch/pull/93) chore(npm): update `package-lock`
+
 ### 3.0.1 (Feb 02, 2021)
 
 * [GH-91](https://github.com/apache/cordova-fetch/pull/91) fix: cordova-fetch with npm@7
