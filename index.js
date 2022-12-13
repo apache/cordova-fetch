@@ -53,7 +53,10 @@ module.exports = async function (target, dest, opts = {}) {
 
         if (!name) {
             // If that fails, get out the big guns and fetch a full manifest using pacote.
-            ({ name } = await pacote.manifest(target, { where: dest }));
+            ({ name } = await pacote.manifest(target, {
+                where: dest,
+                Arborist: require('@npmcli/arborist')
+            }));
         } else if (semver.validRange(rawSpec)) {
             // If the provided spec is a name and a version range, we look for
             // an installed package that satisfies the requested version range
