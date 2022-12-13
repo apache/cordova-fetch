@@ -37,8 +37,8 @@
     "lint": "eslint --ignore-path .gitignore ."
   },
   "engines": {
-    "node": ">= 10",
-    "npm": ">= 5.6.0"
+    "node": ">=16.0.0",
+    "npm": ">=7.10.0"
   },
   "nyc": {
     "include": [
