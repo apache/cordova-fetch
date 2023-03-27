@@ -18,7 +18,7 @@
     "@npmcli/arborist": "^6.1.5",
     "cordova-common": "^5.0.0",
     "execa": "^5.1.1",
-    "fs-extra": "^9.1.0",
+    "fs-extra": "^11.1.1",
     "npm-package-arg": "^8.1.5",
     "pacote": "^15.0.7",
     "pify": "^5.0.0",
