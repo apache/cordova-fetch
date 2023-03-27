@@ -29,7 +29,7 @@
   "devDependencies": {
     "@cordova/eslint-config": "^5.0.0",
     "file-url": "^3.0.0",
-    "jasmine": "^3.99.0",
+    "jasmine": "^4.6.0",
     "nyc": "^15.1.0"
   },
   "scripts": {
