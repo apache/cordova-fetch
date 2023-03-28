@@ -15,11 +15,12 @@
  under the License.
  */
 
+const execa = require('execa');
 const pify = require('pify');
 const which = pify(require('which'));
 const path = require('path');
 const fs = require('fs-extra');
-const { CordovaError, events, superspawn } = require('cordova-common');
+const { CordovaError, events } = require('cordova-common');
 const npa = require('npm-package-arg');
 const pacote = require('pacote');
 const semver = require('semver');
@@ -87,7 +88,7 @@ async function installPackage (target, dest, opts) {
     // Run `npm` to install requested package
     const args = npmArgs(target, opts);
     events.emit('verbose', `fetch: Installing ${target} to ${dest}`);
-    await superspawn.spawn('npm', args, { cwd: dest });
+    return execa('npm', args, { cwd: dest });
 }
 
 function npmArgs (target, opts) {
@@ -165,7 +166,7 @@ module.exports.uninstall = async (target, dest, opts) => {
 
         // run npm uninstall, this will remove dependency
         // from package.json if --save was used.
-        return superspawn.spawn('npm', fetchArgs, opts);
+        return execa('npm', fetchArgs, opts);
     } catch (err) {
         throw new CordovaError(err);
     }
