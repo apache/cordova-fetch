@@ -17,7 +17,7 @@
 
 const execa = require('execa');
 const pify = require('pify');
-const which = pify(require('which'));
+const which = require('which');
 const path = require('path');
 const fs = require('fs-extra');
 const { CordovaError, events } = require('cordova-common');
@@ -125,9 +125,11 @@ async function resolvePathToPackage (name, basedir) {
  * @return {Promise<string>} Absolute path to npm.
  */
 async function isNpmInstalled () {
-    return which('npm').catch(_ => {
+    try {
+        return await which('npm');
+    } catch (e) {
         throw new CordovaError('"npm" command line tool is not installed: make sure it is accessible on your PATH.');
-    });
+    }
 }
 
 module.exports.isNpmInstalled = isNpmInstalled;
