@@ -20,6 +20,26 @@
 -->
 # Cordova-fetch Release Notes
 
+### 4.0.0 (Apr 06, 2023)
+
+* [GH-108](https://github.com/apache/cordova-fetch/pull/108) dep!: bumped `node` & `npm` engine requirment & dependencies w/ `package-lock` rebuild
+  * Engine Requirement Update
+    * Node: `>= 16.13.0`
+    * npm: `>= 8.1.0`
+  * Package Upgrade
+    * `@npmcli/arborist@6.2.5`
+    * `pacote@15.1.1`
+    * `npm-package-arg@10.1.0`
+    * `@cordova/eslint-config@5.0.0`
+    * `fs-extra@11.1.1`
+    * `cordova-common@5.0.0`
+    * `jasmine@4.6.0`
+* [GH-109](https://github.com/apache/cordova-fetch/pull/109) dep!: bump `which@3.0.0`
+* [GH-102](https://github.com/apache/cordova-fetch/pull/102) dep(npm): update `pacote@15.0.7`
+* [GH-75](https://github.com/apache/cordova-fetch/pull/75) refactor: replace `superspawn` with `execa`
+* [GH-110](https://github.com/apache/cordova-fetch/pull/110) test: remove private internal method testing and `rewire`
+* [GH-111](https://github.com/apache/cordova-fetch/pull/111) ci: sync `codecov-action` setup between other repos
+
 ### 3.1.0 (Dec 06, 2022)
 
 * [GH-101](https://github.com/apache/cordova-fetch/pull/101) ci(workflow): update node 14 to use npm ^7.2
