@@ -17,9 +17,9 @@
  under the License.
  */
 
-const path = require('path');
-const fs = require('fs-extra');
-const os = require('os');
+const path = require('node:path');
+const fs = require('node:fs');
+const os = require('node:os');
 
 const tmpDirTemplate = path.join(os.tmpdir(), 'cordova-fetch-tests-');
 module.exports.tmpDir = () => fs.mkdtempSync(tmpDirTemplate);

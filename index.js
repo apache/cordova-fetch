@@ -16,19 +16,25 @@
  */
 
 const execa = require('execa');
-const pify = require('pify');
 const which = require('which');
-const path = require('path');
-const fs = require('fs-extra');
+const path = require('node:path');
+const fs = require('node:fs/promises');
 const { CordovaError, events } = require('cordova-common');
 const npa = require('npm-package-arg');
 const pacote = require('pacote');
 const semver = require('semver');
 
-// pify's multiArgs unfortunately causes resolve to wrap errors in an Array.
-// Thus we wrap the function again to unpack these wrapped errors.
-const rslv = pify(require('resolve'), { multiArgs: true });
-const resolve = (...args) => rslv(...args).catch(([err]) => { throw err; });
+function resolvePackage (...args) {
+    return new Promise((resolve, reject) => {
+        require('resolve')(...args, (err, ...result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
 
 /**
  * Installs a module from npm, a git url or the local file system.
@@ -47,7 +53,7 @@ module.exports = async function (target, dest, opts = {}) {
         }
 
         // Create dest if it doesn't exist yet
-        fs.ensureDirSync(dest);
+        await fs.mkdir(dest, { recursive: true });
 
         // First try to determine the name from the spec using npa. This is very cheap.
         let { name, rawSpec } = npa(target, dest);
@@ -83,7 +89,7 @@ async function installPackage (target, dest, opts) {
     await isNpmInstalled();
 
     // Ensure that `npm` installs to `dest` and not any of its ancestors
-    await fs.ensureDir(path.join(dest, 'node_modules'));
+    await fs.mkdir(path.join(dest, 'node_modules'), { recursive: true });
 
     // Run `npm` to install requested package
     const args = npmArgs(target, opts);
@@ -114,7 +120,7 @@ async function resolvePathToPackage (name, basedir) {
 
     // We resolve the path to the module's package.json to avoid getting the
     // path to `main` which could be located anywhere in the package
-    const [pkgJsonPath, pkgJson] = await resolve(`${name}/package.json`, { paths, basedir });
+    const [pkgJsonPath, pkgJson] = await resolvePackage(`${name}/package.json`, { paths, basedir });
 
     return [path.dirname(pkgJsonPath), pkgJson];
 }
