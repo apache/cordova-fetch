@@ -18,8 +18,8 @@
 const fetch = require('..');
 const uninstall = fetch.uninstall;
 
-const path = require('path');
-const fs = require('fs-extra');
+const path = require('node:path');
+const fs = require('node:fs');
 const fileUrl = require('file-url');
 const helpers = require('./helpers.js');
 
@@ -33,7 +33,7 @@ beforeEach(() => {
 
 afterEach(() => {
     process.chdir(__dirname); // Needed to rm the dir on Windows.
-    fs.removeSync(tmpDir);
+    fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
 function fetchAndMatch (target, pkgProps = { name: target }) {
@@ -45,7 +45,7 @@ function expectPackageToMatch (pkgProps) {
     return result => {
         expect(result).toBeDefined();
         expect(fs.existsSync(result)).toBe(true);
-        const pkg = fs.readJsonSync(path.join(result, 'package.json'));
+        const pkg = JSON.parse(fs.readFileSync(path.join(result, 'package.json'), 'utf8'));
         expect(pkg).toEqual(jasmine.objectContaining(pkgProps));
         return result;
     };
@@ -56,7 +56,7 @@ function expectNotToBeInstalled (pkgName) {
 }
 
 function expectDevDependenciesToBe (deps) {
-    const rootPJ = fs.readJsonSync(path.join(tmpDir, 'package.json'));
+    const rootPJ = JSON.parse(fs.readFileSync(path.join(tmpDir, 'package.json'), 'utf8'));
     expect(rootPJ.devDependencies || {}).toEqual(deps);
 }
 
@@ -81,7 +81,7 @@ describe('fetch/uninstall with --save', () => {
     beforeEach(() => {
         opts = { save: true };
         // copy package.json from spec directory to tmpDir
-        fs.copySync(path.join(__dirname, 'testpkg.json'), 'package.json');
+        fs.cpSync(path.join(__dirname, 'testpkg.json'), 'package.json');
     });
 
     it('should fetch and uninstall a cordova platform via npm & git tags/branches', () => {
@@ -132,7 +132,7 @@ describe('fetch/uninstall with --save', () => {
 
 describe('fetching already installed packages', () => {
     beforeEach(() => {
-        fs.copySync(path.join(__dirname, 'support'), 'support');
+        fs.cpSync(path.join(__dirname, 'support'), 'support', { recursive: true });
     });
 
     it('should return package path for registry packages', () => {
@@ -183,14 +183,14 @@ describe('fetching with node_modules in ancestor dirs', () => {
     beforeEach(() => {
         const testRoot = path.join(tmpDir, 'test-root');
         fetchDestination = path.join(testRoot, 'fetch-dest');
-        fs.ensureDirSync(fetchDestination);
+        fs.mkdirSync(fetchDestination, { recursive: true });
 
         // Make test root look like a package root directory
-        fs.ensureDirSync(path.join(testRoot, 'node_modules'));
-        fs.outputJsonSync(path.join(testRoot, 'package.json'), { private: true });
+        fs.mkdirSync(path.join(testRoot, 'node_modules'), { recursive: true });
+        fs.writeFileSync(path.join(testRoot, 'package.json'), JSON.stringify({ private: true }, null, 2), 'utf8');
 
         // Copy test fixtures to avoid linking out of temp directory
-        fs.copySync(path.join(__dirname, 'support'), 'support');
+        fs.cpSync(path.join(__dirname, 'support'), 'support', { recursive: true });
         fetchTarget = fileUrl(path.resolve('support/dummy-local-plugin'));
     });
 
