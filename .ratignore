@@ -1,3 +1,4 @@
+\.(.*)
 jasmine.json
 testpkg.json
-*.git
+(.*).git
