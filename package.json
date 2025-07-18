@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@npmcli/arborist": "^7.4.0",
-    "cordova-common": "^5.0.0",
+    "cordova-common": "^5.0.1",
     "execa": "^5.1.1",
     "npm-package-arg": "^11.0.1",
     "pacote": "^17.0.6",
