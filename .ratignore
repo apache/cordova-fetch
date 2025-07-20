@@ -2,3 +2,5 @@
 jasmine.json
 testpkg.json
 (.*).git
+coverage
+node_modules
