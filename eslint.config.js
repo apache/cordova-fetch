@@ -17,9 +17,27 @@
     under the License.
 */
 
-const path = require('node:path');
-const fs = require('node:fs');
-const os = require('node:os');
+const { defineConfig, globalIgnores } = require('eslint/config');
+const nodeConfig = require('@cordova/eslint-config/node');
+const nodeTestConfig = require('@cordova/eslint-config/node-tests');
 
-const tmpDirTemplate = path.join(os.tmpdir(), 'cordova-fetch-tests-');
-module.exports.tmpDir = () => fs.mkdtempSync(tmpDirTemplate);
+module.exports = defineConfig([
+    globalIgnores([
+        '**/coverage/'
+    ]),
+    ...nodeConfig.map(config => ({
+        ...config,
+        rules: {
+            ...(config.rules || {}),
+            'no-unused-vars': ['error', {
+                args: 'after-used',
+                vars: 'all',
+                ignoreRestSiblings: true
+            }]
+        }
+    })),
+    ...nodeTestConfig.map(config => ({
+        files: ['spec/**/*.js'],
+        ...config
+    }))
+]);
