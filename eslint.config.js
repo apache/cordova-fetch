@@ -25,17 +25,7 @@ module.exports = defineConfig([
     globalIgnores([
         '**/coverage/'
     ]),
-    ...nodeConfig.map(config => ({
-        ...config,
-        rules: {
-            ...(config.rules || {}),
-            'no-unused-vars': ['error', {
-                args: 'after-used',
-                vars: 'all',
-                ignoreRestSiblings: true
-            }]
-        }
-    })),
+    ...nodeConfig,
     ...nodeTestConfig.map(config => ({
         files: ['spec/**/*.js'],
         ...config
