@@ -2,3 +2,4 @@
 spec
 coverage
 temp
+eslint.config.js
