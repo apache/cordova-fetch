@@ -22,19 +22,27 @@ const uninstall = fetch.uninstall;
 
 const path = require('node:path');
 const fs = require('node:fs');
-const helpers = require('./helpers.js');
+const tmp = require('tmp');
 
-let tmpDir, opts;
+tmp.setGracefulCleanup();
+
+const tmpRoot = tmp.dirSync({ unsafeCleanup: true });
+const tmpDir = path.join(tmpRoot.name, 'cordova-fetch-tests');
+
+let opts;
 
 beforeEach(() => {
     opts = {};
-    tmpDir = helpers.tmpDir();
+    fs.mkdirSync(tmpDir, { recursive: true });
     process.chdir(tmpDir);
 });
 
-afterEach(() => {
+afterEach((done) => {
     process.chdir(__dirname); // Needed to rm the dir on Windows.
-    fs.rmSync(tmpDir, { recursive: true, force: true });
+    setTimeout(() => {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+        done();
+    }, 250);
 });
 
 function fetchAndMatch (target, pkgProps = { name: target }) {
