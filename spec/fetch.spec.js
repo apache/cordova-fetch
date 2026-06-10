@@ -23,6 +23,7 @@ const uninstall = fetch.uninstall;
 const path = require('node:path');
 const fs = require('node:fs');
 const tmp = require('tmp');
+const { promiseRetry } = require('@gar/promise-retry');
 
 tmp.setGracefulCleanup();
 
@@ -37,13 +38,19 @@ beforeEach(() => {
     process.chdir(tmpDir);
 });
 
-afterEach((done) => {
+afterEach(() => {
     process.chdir(__dirname); // Needed to rm the dir on Windows.
-    setTimeout(() => {
-        fs.rmSync(tmpDir, { recursive: true, force: true });
-        done();
-    }, 250);
-});
+
+    return promiseRetry((retry) => {
+        return fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(err => {
+            if (process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EACCES' || err.code === 'EBUSY')) {
+                return retry(err);
+            }
+
+            throw err;
+        });
+    }, { retries: 5, minTimeout: 500 });
+}, 30000);
 
 function fetchAndMatch (target, pkgProps = { name: target }) {
     return fetch(target, tmpDir, opts)
@@ -79,11 +86,11 @@ describe('fetch/uninstall tests via npm & git', () => {
             .then(_ => fetchAndMatch('https://github.com/apache/cordova-browser.git', { name: 'cordova-browser' }))
             .then(_ => uninstall('cordova-browser', tmpDir, opts))
             .then(_ => expectNotToBeInstalled('cordova-browser'));
-    }, 60000);
+    }, 120000);
 
     it('should fetch a scoped plugin from npm', () => {
         return fetchAndMatch('@stevegill/cordova-plugin-device');
-    }, 30000);
+    }, 60000);
 });
 
 describe('fetch/uninstall with --save', () => {
