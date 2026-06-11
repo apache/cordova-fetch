@@ -22,20 +22,35 @@ const uninstall = fetch.uninstall;
 
 const path = require('node:path');
 const fs = require('node:fs');
-const helpers = require('./helpers.js');
+const tmp = require('tmp');
+const { promiseRetry } = require('@gar/promise-retry');
 
-let tmpDir, opts;
+tmp.setGracefulCleanup();
+
+const tmpRoot = tmp.dirSync({ unsafeCleanup: true });
+const tmpDir = path.join(tmpRoot.name, 'cordova-fetch-tests');
+
+let opts;
 
 beforeEach(() => {
     opts = {};
-    tmpDir = helpers.tmpDir();
+    fs.mkdirSync(tmpDir, { recursive: true });
     process.chdir(tmpDir);
 });
 
 afterEach(() => {
     process.chdir(__dirname); // Needed to rm the dir on Windows.
-    fs.rmSync(tmpDir, { recursive: true, force: true });
-});
+
+    return promiseRetry((retry) => {
+        return fs.promises.rm(tmpDir, { recursive: true, force: true }).catch(err => {
+            if (process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EACCES' || err.code === 'EBUSY')) {
+                return retry(err);
+            }
+
+            throw err;
+        });
+    }, { retries: 5, minTimeout: 500 });
+}, 30000);
 
 function fetchAndMatch (target, pkgProps = { name: target }) {
     return fetch(target, tmpDir, opts)
@@ -71,11 +86,11 @@ describe('fetch/uninstall tests via npm & git', () => {
             .then(_ => fetchAndMatch('https://github.com/apache/cordova-browser.git', { name: 'cordova-browser' }))
             .then(_ => uninstall('cordova-browser', tmpDir, opts))
             .then(_ => expectNotToBeInstalled('cordova-browser'));
-    }, 60000);
+    }, 120000);
 
     it('should fetch a scoped plugin from npm', () => {
         return fetchAndMatch('@stevegill/cordova-plugin-device');
-    }, 30000);
+    }, 60000);
 });
 
 describe('fetch/uninstall with --save', () => {
