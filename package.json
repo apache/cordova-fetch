@@ -28,7 +28,7 @@
     "@cordova/eslint-config": "^6.0.0",
     "@gar/promise-retry": "^1.0.3",
     "c8": "^11.0.0",
-    "jasmine": "^6.3.0",
+    "jasmine": "^7.0.0",
     "tmp": "^0.2.5"
   },
   "overrides": {
